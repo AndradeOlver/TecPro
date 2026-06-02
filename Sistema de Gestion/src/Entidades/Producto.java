@@ -1,0 +1,134 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package Entidades;
+
+/**
+ *
+ * @author equipo
+ */
+public class Producto {
+    private static int contadorGlobal = 100000;
+    private int id;
+    private String descripcion;
+    private double precioVentaBase;
+    private double precioCompra;
+    private int stock;
+    public Producto( String descripcion, double precioVentaBase, double precioCompra, int stock) {
+        
+        this.id = contadorGlobal++;
+        setDescripcion(descripcion);
+        setPrecioVentaBase(precioVentaBase);
+        setPrecioCompra(precioCompra);
+        setStock(stock);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+   
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        if (descripcion != null && !descripcion.isBlank()) {
+            this.descripcion = descripcion;
+        } else {
+            throw new IllegalArgumentException("Error: La descripción del producto no puede estar vacía.");
+        }
+    }
+
+    public double getPrecioVentaBase() {
+        return precioVentaBase;
+    }
+
+    public void setPrecioVentaBase(double precioVentaBase) {
+        if (precioVentaBase > 0) {
+            this.precioVentaBase = precioVentaBase;
+        } else {
+            throw new IllegalArgumentException("Error: El precio de venta base debe ser mayor a 0.");
+        }
+    }
+
+    public double getPrecioCompra() {
+        return precioCompra;
+    }
+
+    public void setPrecioCompra(double precioCompra) {
+        if (precioCompra > 0) {
+            this.precioCompra = precioCompra;
+        } else {
+            throw new IllegalArgumentException("Error: El precio de compra debe ser mayor a 0.");
+        }
+    }
+
+    public int getStock() {
+        return stock;
+    }
+
+    public void setStock(int stock) {
+        if (stock >= 0) {
+            this.stock = stock;
+        } else {
+            throw new IllegalArgumentException("Error: El stock debe ser mayor o igual a 0.");
+        }
+    }
+    
+    public void actualizarStock(int cantidad, String tipoMovimiento) {
+        // Validamos que no nos envíen cantidades negativas por error
+        if (cantidad <= 0) {
+            throw new IllegalArgumentException("Error: La cantidad a mover debe ser mayor a 0.");
+        }
+
+        if (tipoMovimiento.equals("entrada")) {
+            // Camino 1: Ingreso de mercadería (Sumamos)
+            this.setStock(this.stock + cantidad);
+            
+        } else if (tipoMovimiento.equals("salida")) {
+            // Camino 2: Venta de mercadería (Restamos con Guardia de Seguridad)
+            if (this.stock >= cantidad) {
+                this.setStock(this.stock - cantidad);
+            } else {
+                throw new IllegalStateException("Error: Stock insuficiente para realizar la salida. Stock actual: " + this.stock);
+            }
+        } else {
+            throw new IllegalArgumentException("Error: El tipo de movimiento debe ser 'entrada' o 'salida'.");
+        }
+    }
+    
+    public void recalcularCostoPromedio(int cantidadNueva, double precioNuevo) {
+        // Validación básica
+        if (cantidadNueva <= 0 || precioNuevo < 0) {
+            throw new IllegalArgumentException("Error: Cantidad y precio nuevo deben ser válidos.");
+        }
+
+       
+        double valorInventarioActual = this.stock * this.precioCompra;
+
+        // Paso 2: Tu dinero nuevo
+        double valorIngresoNuevo = cantidadNueva * precioNuevo;
+
+        // Paso 3: La suma de cantidades físicas
+        int nuevoStockTotal = this.stock + cantidadNueva;
+
+        // Paso 4: La fórmula del Promedio Ponderado
+        double nuevoCostoPromedio = (valorInventarioActual + valorIngresoNuevo) / nuevoStockTotal;
+
+        // Actualizamos la variable de la clase
+        this.setPrecioCompra(nuevoCostoPromedio);
+    }
+    public boolean validarPrecioVenta(double precioPropuesto) {
+        
+        if (precioPropuesto > this.precioCompra) {
+            return true;
+        } else {
+
+            return false;
+        }
+    }
+    
+}
