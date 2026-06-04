@@ -12,13 +12,15 @@ public class Proveedor {
     private String ruc;
     private String razonSocial;
     private String contacto;
+    private String direccion;
     private String numeroContacto;
     private String correoContacto;
-    public Proveedor(String ruc, String razonSocial, String contacto, String numeroContacto, String correoContacto) {
+    public Proveedor(String ruc, String razonSocial,String direccion,String contacto, String numeroContacto, String correoContacto) {
         
         setRuc(ruc);
         setRazonSocial(razonSocial);
         setContacto(contacto);
+        setDireccion(direccion);
         setNumeroContacto(numeroContacto);
         setCorreoContacto(correoContacto);
     }
@@ -59,6 +61,17 @@ public class Proveedor {
             this.contacto = contacto;
         } else {
             throw new IllegalArgumentException("Error: El nombre del contacto no puede estar vacío.");
+        }
+    }
+     public String getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+      if (direccion != null && !direccion.isBlank()) {
+            this.direccion = direccion;
+        } else {
+            throw new IllegalArgumentException("Error: La dirección no puede estar vacía.");
         }
     }
 

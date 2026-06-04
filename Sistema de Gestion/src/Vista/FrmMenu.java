@@ -5,13 +5,15 @@
 package Vista;
 
 import Gestores.GestorContactos;
+import Gestores.GestorInventario;
 
 /**
  *
  * @author equipo
  */
 public class FrmMenu extends javax.swing.JFrame {
-    private Gestores.GestorContactos gestorContactos = new Gestores.GestorContactos();
+    private GestorContactos gestorContactos = new GestorContactos();
+    private GestorInventario gestorInventario= new GestorInventario();
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrmMenu.class.getName());
 
@@ -32,27 +34,42 @@ public class FrmMenu extends javax.swing.JFrame {
     private void initComponents() {
 
         btnAbrirClientes = new javax.swing.JButton();
+        btnAbrirProductos = new javax.swing.JButton();
+        btnAbrirProveedores = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         btnAbrirClientes.setText("Clientes");
         btnAbrirClientes.addActionListener(this::btnAbrirClientesActionPerformed);
 
+        btnAbrirProductos.setText("Productos");
+        btnAbrirProductos.addActionListener(this::btnAbrirProductosActionPerformed);
+
+        btnAbrirProveedores.setText("Proveedores");
+        btnAbrirProveedores.addActionListener(this::btnAbrirProveedoresActionPerformed);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(45, 45, 45)
-                .addComponent(btnAbrirClientes)
-                .addContainerGap(50, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(114, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnAbrirProductos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnAbrirClientes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnAbrirProveedores, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(39, 39, 39))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(37, 37, 37)
+                .addGap(38, 38, 38)
                 .addComponent(btnAbrirClientes)
-                .addContainerGap(43, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnAbrirProveedores)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
+                .addComponent(btnAbrirProductos)
+                .addGap(35, 35, 35))
         );
 
         pack();
@@ -66,6 +83,20 @@ public class FrmMenu extends javax.swing.JFrame {
         this.setVisible(false);
         
     }//GEN-LAST:event_btnAbrirClientesActionPerformed
+
+    private void btnAbrirProductosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbrirProductosActionPerformed
+        // TODO add your handling code here:
+        FrmProductos ventanaNueva= new FrmProductos(this.gestorInventario);
+        ventanaNueva.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_btnAbrirProductosActionPerformed
+
+    private void btnAbrirProveedoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbrirProveedoresActionPerformed
+        // TODO add your handling code here:
+        FrmProveedores ventanaNueva= new FrmProveedores(this.gestorContactos);
+        ventanaNueva.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_btnAbrirProveedoresActionPerformed
 
     /**
      * @param args the command line arguments
@@ -94,5 +125,7 @@ public class FrmMenu extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAbrirClientes;
+    private javax.swing.JButton btnAbrirProductos;
+    private javax.swing.JButton btnAbrirProveedores;
     // End of variables declaration//GEN-END:variables
 }

@@ -84,6 +84,21 @@ public class GestorContactos {
         }
         return null;
     }
+    
+    public List<Proveedor> buscarProveedorPorNombre(String textoBusqueda) {
+        // Lógica de filtro: Retorna una sub-lista con todas las coincidencias parciales
+        List<Proveedor> resultados = new ArrayList<>();
+        
+        for (Proveedor p : listaProveedores) {
+            // Convertimos todo a minúsculas para que la búsqueda no sea sensible a mayúsculas
+            // Nota: Si el atributo en tu clase Proveedor se llama "razonSocial", 
+            // cambia p.getNombre() por p.getRazonSocial()
+            if (p.getRazonSocial().toLowerCase().contains(textoBusqueda.toLowerCase())) {
+                resultados.add(p);
+            }
+        }
+        return resultados;
+    }
     // ==========================================
     // MÉTODO DE SIMULACIÓN (DATOS DE PRUEBA)
     // ==========================================
@@ -96,7 +111,7 @@ public class GestorContactos {
             registrarCliente(new Cliente(1001, "Juan Perez", "Av. Principal 123", "juan@mail.com", "987654321"));
             registrarCliente(new Cliente(1002, "Maria Gomez", "Calle Las Flores 45", "maria@mail.com", "912345678"));
             
-            registrarProveedor(new Proveedor("20123456789", "Distribuidora Central S.A.", "Carlos Ruiz", "998877665", "ventas@central.com"));
+            registrarProveedor(new Proveedor("20123456789", "Distribuidora Central S.A.","Emancipacion", "Carlos Ruiz", "998877665", "ventas@central.com"));
         } catch (Exception e) {
             System.out.println("Error cargando semillas: " + e.getMessage());
         }
@@ -111,9 +126,48 @@ public class GestorContactos {
         if (listaClientes.get(i).getCodigo() == clienteModificado.getCodigo()) {
             listaClientes.set(i, clienteModificado);
             return; // Termina la búsqueda una vez actualizado
+            }
         }
     }
-}
+    // Método para que tu interfaz gráfica pueda leer todos los proveedores
+    public List<Proveedor> obtenerTodosLosProveedores() {
+        return this.listaProveedores;
+    }
+
+    // Método para actualizar un proveedor existente
+    public void actualizarProveedor(Proveedor proveedorModificado) {
+        for (int i = 0; i < listaProveedores.size(); i++) {
+            // Usamos equals() porque el RUC es un String
+            if (listaProveedores.get(i).getRuc().equals(proveedorModificado.getRuc())) {
+                listaProveedores.set(i, proveedorModificado);
+                return; // Termina la búsqueda una vez actualizado
+            }
+        }
+    }
+    
+    // ==========================================
+    // MÉTODOS PARA ELIMINAR (Opcionales pero recomendados)
+    // ==========================================
+
+    public boolean eliminarCliente(int codigoAEliminar) {
+        for (int i = 0; i < listaClientes.size(); i++) {
+            if (listaClientes.get(i).getCodigo() == codigoAEliminar) {
+                listaClientes.remove(i);
+                return true; // Retorna true si se eliminó con éxito
+            }
+        }
+        return false; // Retorna false si no encontró el código
+    }
+
+    public boolean eliminarProveedor(String rucAEliminar) {
+        for (int i = 0; i < listaProveedores.size(); i++) {
+            if (listaProveedores.get(i).getRuc().equals(rucAEliminar)) {
+                listaProveedores.remove(i);
+                return true; // Retorna true si se eliminó con éxito
+            }
+        }
+        return false; // Retorna false si no encontró el RUC
+    }
     
     
 }

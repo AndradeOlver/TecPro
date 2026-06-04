@@ -157,6 +157,31 @@ public class GestorInventario {
     public List<OrdenCompra> obtenerHistorialCompras() {
         return this.historialCompras;
     }
+    public void actualizarProducto(Producto productoModificado) {
+        if (productoModificado == null) {
+            throw new IllegalArgumentException("Error: El producto a actualizar no puede ser nulo.");
+        }
+
+        boolean encontrado = false;
+        
+        // Usamos un bucle clásico para tener acceso al índice (i)
+        for (int i = 0; i < catalogoProductos.size(); i++) {
+            // Buscamos cuál de los productos viejos tiene el mismo ID que el nuevo
+            if (catalogoProductos.get(i).getId() == productoModificado.getId()) {
+                
+                // Reemplazamos el objeto viejo por el nuevo en esa posición exacta
+                catalogoProductos.set(i, productoModificado);
+                encontrado = true;
+                
+                break; // Rompemos el ciclo porque ya lo actualizamos
+            }
+        }
+
+        // Si terminó de revisar toda la lista y no lo encontró, lanzamos una alerta
+        if (!encontrado) {
+            throw new IllegalArgumentException("Error: No se encontró el producto con ID " + productoModificado.getId() + " en el sistema.");
+        }
+    }
     
     
     
