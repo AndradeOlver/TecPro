@@ -106,6 +106,14 @@ public class GestorContactos {
     public List<Cliente> obtenerTodosLosClientes() {
         return this.listaClientes;
     }
+    public void actualizarCliente(Cliente clienteModificado) {
+    for (int i = 0; i < listaClientes.size(); i++) {
+        if (listaClientes.get(i).getCodigo() == clienteModificado.getCodigo()) {
+            listaClientes.set(i, clienteModificado);
+            return; // Termina la búsqueda una vez actualizado
+        }
+    }
+}
     
     
 }

@@ -69,7 +69,7 @@ public class Cliente {
     }
     
     public void setCorreo(String correo) {
-      if (correo != null && correo.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+      if (correo != null && correo.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) { //validacion mas completa
             this.correo = correo;
         } else {
             throw new IllegalArgumentException("Error: Formato de correo electrónico inválido.");
