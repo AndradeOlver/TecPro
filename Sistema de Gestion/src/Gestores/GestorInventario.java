@@ -106,7 +106,14 @@ public class GestorInventario {
         // 2. Disparamos la lógica interna de la orden (que ya programaste en la entidad)
         // Esto confirmará el estado y ejecutará el promedio ponderado de los productos
         ordenGuardada.confirmarIngreso();
-        ordenGuardada.procesarEntradaAlmacen();
+        
+        // 3. Procesamos la entrada y ATRAPAMOS los registros que nos devuelve la orden
+        List<MovimientosKardex> nuevosMovimientos = ordenGuardada.procesarEntradaAlmacen();
+        
+        // 4. GUARDAMOS DEFINITIVAMENTE los registros en el archivero (Kardex global)
+        if (nuevosMovimientos != null && !nuevosMovimientos.isEmpty()) {
+            this.bitacoraKardex.addAll(nuevosMovimientos);
+        }
         
         // Nota Arquitectónica: En una versión con Base de Datos, aquí llamarías
         // a un método para guardar los nuevos MovimientosKardex generados en SQL.
@@ -151,11 +158,11 @@ public class GestorInventario {
     
     // Métodos de acceso general para pintar las tablas en los Forms  
     public List<Producto> obtenerCatalogoCompleto() {
-        return this.catalogoProductos;
+        return new ArrayList<>(this.catalogoProductos);
     }
     
     public List<OrdenCompra> obtenerHistorialCompras() {
-        return this.historialCompras;
+        return new ArrayList<>(this.historialCompras);
     }
     public void actualizarProducto(Producto productoModificado) {
         if (productoModificado == null) {

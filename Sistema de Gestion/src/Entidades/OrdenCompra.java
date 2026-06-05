@@ -102,7 +102,8 @@ public class OrdenCompra {
             this.lotes.add(lote);
         }
     }
-    public void procesarEntradaAlmacen() {
+ 
+    public List<MovimientosKardex> procesarEntradaAlmacen() {
         // Seguridad: No podemos procesar el almacén si la orden no ha sido confirmada primero
         if (!this.estado.equals("Procesada")) {
             throw new IllegalStateException("Error: Primero debes confirmar el ingreso de la orden.");
@@ -112,28 +113,40 @@ public class OrdenCompra {
             throw new IllegalStateException("Error: No se puede procesar una orden sin productos.");
         }
 
+        // 1. Creamos la "cesta" para guardar los movimientos generados
+        List<MovimientosKardex> movimientosGenerados = new ArrayList<>();
+
         // RECORREMOS CADA LOTE (El efecto dominó)
         for (LoteProducto lote : this.lotes) {
-            Producto productoDelLote = lote.getProducto(); // Obtenemos el producto amarrado al lote
+            Producto productoDelLote = lote.getProducto(); 
             
             if (productoDelLote != null) {
+                // Actualizamos costos y stock
+                
                 // 1. Llamamos a Recalcular Costo Promedio (Necesita cantidad y precio del lote)
                 productoDelLote.recalcularCostoPromedio(lote.getCantidadIngresada(), lote.getPrecioCompraIndividual());
                 
                 // 2. Llamamos a Actualizar Stock (Suma la cantidad física al almacén)
                 productoDelLote.actualizarStock(lote.getCantidadIngresada(), "entrada");
                 
+                // Creamos el registro ("el papel")
                 MovimientosKardex nuevoMovimiento = new MovimientosKardex(
                     this.fechaIngreso,                      
                     "entrada",                              
-                    lote.getCantidadIngresada(),           
+                    lote.getCantidadIngresada(),            
                     lote.getPrecioCompraIndividual(),       
                     productoDelLote.getStock(),             
                     productoDelLote.getPrecioCompra(),      
                     productoDelLote                        
                 );
+                
+                // 2. Metemos el registro en nuestra cesta
+                movimientosGenerados.add(nuevoMovimiento);
             }
         }
+        
+        // 3. Devolvemos la cesta llena de registros
+        return movimientosGenerados;
     }
     
 }

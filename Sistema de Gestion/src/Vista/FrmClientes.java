@@ -137,6 +137,7 @@ public class FrmClientes extends javax.swing.JFrame {
         textBusquedaNombre.addActionListener(this::textBusquedaNombreActionPerformed);
 
         btnCancelar.setText("Cancelar");
+        btnCancelar.setToolTipText("");
         btnCancelar.addActionListener(this::btnCancelarActionPerformed);
 
         btnBuscarCodigo.setText("Buscar por DNI/RUC");
@@ -150,6 +151,7 @@ public class FrmClientes extends javax.swing.JFrame {
         btnQuitarFiltro.setText("Quitar Filtro");
         btnQuitarFiltro.addActionListener(this::btnQuitarFiltroActionPerformed);
 
+        btnActualizar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/edit.png"))); // NOI18N
         btnActualizar.setText("Actualizar");
         btnActualizar.addActionListener(this::btnActualizarActionPerformed);
 

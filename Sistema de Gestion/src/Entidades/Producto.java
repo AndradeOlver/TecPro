@@ -12,9 +12,9 @@ public class Producto {
     private static int contadorGlobal = 100000;
     private int id;
     private String descripcion;
-    private double precioVentaBase;
-    private double precioCompra;
-    private int stock;
+    private Double precioVentaBase;
+    private Double precioCompra;
+    private Integer stock;
     public Producto( String descripcion, double precioVentaBase, double precioCompra, int stock) {
         
         this.id = contadorGlobal++;
@@ -23,6 +23,15 @@ public class Producto {
         setPrecioCompra(precioCompra);
         setStock(stock);
     }
+     public Producto( String descripcion) {
+        
+        this.id = contadorGlobal++;
+        setDescripcion(descripcion);
+        this.precioVentaBase=null;
+        this.precioCompra=null;
+        this.stock=null;
+    }
+
 
     public int getId() {
         return id;
@@ -46,8 +55,8 @@ public class Producto {
         return precioVentaBase;
     }
 
-    public void setPrecioVentaBase(double precioVentaBase) {
-        if (precioVentaBase > 0) {
+    public void setPrecioVentaBase(Double precioVentaBase) {
+        if (precioVentaBase > 0||precioVentaBase ==null) {
             this.precioVentaBase = precioVentaBase;
         } else {
             throw new IllegalArgumentException("Error: El precio de venta base debe ser mayor a 0.");
@@ -58,8 +67,8 @@ public class Producto {
         return precioCompra;
     }
 
-    public void setPrecioCompra(double precioCompra) {
-        if (precioCompra > 0) {
+    public void setPrecioCompra(Double precioCompra) {
+        if (precioCompra > 0 || precioCompra ==null) {
             this.precioCompra = precioCompra;
         } else {
             throw new IllegalArgumentException("Error: El precio de compra debe ser mayor a 0.");
@@ -70,8 +79,8 @@ public class Producto {
         return stock;
     }
 
-    public void setStock(int stock) {
-        if (stock >= 0) {
+    public void setStock(Integer stock) {
+        if (stock >= 0 || stock ==null) {
             this.stock = stock;
         } else {
             throw new IllegalArgumentException("Error: El stock debe ser mayor o igual a 0.");
@@ -79,6 +88,8 @@ public class Producto {
     }
     
     public void actualizarStock(int cantidad, String tipoMovimiento) {
+        if(this.stock==null) this.stock=0;
+        
         // Validamos que no nos envíen cantidades negativas por error
         if (cantidad <= 0) {
             throw new IllegalArgumentException("Error: La cantidad a mover debe ser mayor a 0.");
@@ -101,6 +112,8 @@ public class Producto {
     }
     
     public void recalcularCostoPromedio(int cantidadNueva, double precioNuevo) {
+        if(this.precioCompra==null) this.precioCompra=0.0;
+        if(this.stock==null) this.stock=0;
         // Validación básica
         if (cantidadNueva <= 0 || precioNuevo < 0) {
             throw new IllegalArgumentException("Error: Cantidad y precio nuevo deben ser válidos.");
@@ -122,6 +135,10 @@ public class Producto {
         this.setPrecioCompra(nuevoCostoPromedio);
     }
     public boolean validarPrecioVenta(double precioPropuesto) {
+        
+        if (this.precioCompra == null) {
+            return true; 
+        }
         
         if (precioPropuesto > this.precioCompra) {
             return true;
