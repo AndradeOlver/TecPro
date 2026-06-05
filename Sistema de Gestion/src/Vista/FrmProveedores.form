@@ -48,65 +48,70 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" pref="63" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="labelNumero" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="labelCodigo" alignment="0" min="-2" pref="104" max="-2" attributes="0"/>
-                          <Component id="labelNombre" min="-2" pref="104" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="labelDireccion" alignment="1" min="-2" pref="208" max="-2" attributes="0"/>
-                              <Component id="labelCorreo" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <Component id="labelContacto" alignment="1" min="-2" pref="208" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="textDireccion" pref="141" max="32767" attributes="0"/>
-                          <Component id="textCorreo" alignment="1" max="32767" attributes="0"/>
-                          <Component id="textNumero" alignment="1" max="32767" attributes="0"/>
-                          <Component id="textNombre" alignment="1" max="32767" attributes="0"/>
-                          <Component id="textCodigo" alignment="1" max="32767" attributes="0"/>
-                          <Component id="textContacto" alignment="0" pref="141" max="32767" attributes="0"/>
-                      </Group>
-                      <EmptySpace min="-2" pref="82" max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" alignment="1" attributes="0">
-                      <Component id="btnCancelar" min="-2" pref="102" max="-2" attributes="0"/>
+                  <Group type="102" attributes="0">
+                      <Component id="btnRegresar" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="btnActualizar" min="-2" pref="102" max="-2" attributes="0"/>
-                          <Component id="btnGuardar" min="-2" pref="102" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace min="-2" pref="98" max="-2" attributes="0"/>
-                  </Group>
-              </Group>
-              <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="1" attributes="0">
-                      <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                          <Component id="btnBuscarCodigo" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="btnBuscarPorNombre" alignment="0" max="32767" attributes="0"/>
-                      </Group>
-                      <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="textBusquedaCodigo" pref="204" max="32767" attributes="0"/>
-                          <Component id="textBusquedaNombre" max="32767" attributes="0"/>
-                      </Group>
-                      <EmptySpace min="-2" pref="69" max="-2" attributes="0"/>
+                      <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="138" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="btnQuitarFiltro" min="-2" pref="141" max="-2" attributes="0"/>
-                          <Component id="jScrollPane1" alignment="0" min="-2" pref="380" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="labelNumero" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="labelCodigo" alignment="0" min="-2" pref="104" max="-2" attributes="0"/>
+                                  <Component id="labelNombre" min="-2" pref="104" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="labelDireccion" alignment="1" min="-2" pref="208" max="-2" attributes="0"/>
+                                      <Component id="labelCorreo" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Component id="labelContacto" alignment="1" min="-2" pref="208" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="textDireccion" pref="141" max="32767" attributes="0"/>
+                                  <Component id="textCorreo" alignment="1" max="32767" attributes="0"/>
+                                  <Component id="textNumero" alignment="1" max="32767" attributes="0"/>
+                                  <Component id="textNombre" alignment="1" max="32767" attributes="0"/>
+                                  <Component id="textCodigo" alignment="1" max="32767" attributes="0"/>
+                                  <Component id="textContacto" alignment="0" pref="141" max="32767" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="-2" pref="82" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="1" attributes="0">
+                              <Component id="btnCancelar" min="-2" pref="102" max="-2" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="btnActualizar" min="-2" pref="102" max="-2" attributes="0"/>
+                                  <Component id="btnGuardar" min="-2" pref="102" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="-2" pref="98" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="1" attributes="0">
+                              <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                                  <Component id="btnBuscarCodigo" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="btnBuscarPorNombre" alignment="0" max="32767" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                  <Component id="textBusquedaCodigo" pref="204" max="32767" attributes="0"/>
+                                  <Component id="textBusquedaNombre" max="32767" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="-2" pref="69" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="btnQuitarFiltro" min="-2" pref="141" max="-2" attributes="0"/>
+                                  <Component id="jScrollPane1" alignment="0" min="-2" pref="380" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace pref="62" max="32767" attributes="0"/>
+                          </Group>
+                      </Group>
                   </Group>
               </Group>
-          </Group>
-          <Group type="102" alignment="1" attributes="0">
-              <EmptySpace max="32767" attributes="0"/>
-              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="138" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -148,8 +153,11 @@
                   </Group>
                   <Group type="102" attributes="0">
                       <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
-                      <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="20" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnRegresar" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace pref="17" max="32767" attributes="0"/>
                       <Component id="jScrollPane1" min="-2" pref="306" max="-2" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
@@ -353,6 +361,14 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Ingrese Contacto"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="btnRegresar">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Regresar"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRegresarActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>
