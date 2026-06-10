@@ -572,7 +572,7 @@ public class FrmClientes extends javax.swing.JFrame {
 
         // C. Le aplicamos el tamaño ganador a la columna, más 10 píxeles de margen estético
         columna.setPreferredWidth(anchoCalculado + 10);
-    }
+    }           
 }
     
     

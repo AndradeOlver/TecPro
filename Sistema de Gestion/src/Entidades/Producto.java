@@ -51,36 +51,36 @@ public class Producto {
         }
     }
 
-    public double getPrecioVentaBase() {
+    public Double getPrecioVentaBase() {
         return precioVentaBase;
     }
 
     public void setPrecioVentaBase(Double precioVentaBase) {
-        if (precioVentaBase > 0||precioVentaBase ==null) {
+        if (precioVentaBase ==null||precioVentaBase > 0) {
             this.precioVentaBase = precioVentaBase;
         } else {
             throw new IllegalArgumentException("Error: El precio de venta base debe ser mayor a 0.");
         }
     }
 
-    public double getPrecioCompra() {
+    public Double getPrecioCompra() {
         return precioCompra;
     }
 
     public void setPrecioCompra(Double precioCompra) {
-        if (precioCompra > 0 || precioCompra ==null) {
+        if ( precioCompra ==null||precioCompra > 0 ) {
             this.precioCompra = precioCompra;
         } else {
             throw new IllegalArgumentException("Error: El precio de compra debe ser mayor a 0.");
         }
     }
 
-    public int getStock() {
+    public Integer getStock() {
         return stock;
     }
 
     public void setStock(Integer stock) {
-        if (stock >= 0 || stock ==null) {
+        if ( stock ==null||stock >= 0 ) {
             this.stock = stock;
         } else {
             throw new IllegalArgumentException("Error: El stock debe ser mayor o igual a 0.");

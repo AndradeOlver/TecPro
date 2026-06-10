@@ -13,8 +13,8 @@ import Gestores.GestorInventario;
  */
 public class FrmMenu extends javax.swing.JFrame {
     private GestorContactos gestorContactos = new GestorContactos();
-    private GestorInventario gestorInventario= new GestorInventario();
-    
+     private GestorInventario gestorInventario= new GestorInventario();
+            
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrmMenu.class.getName());
 
     /**

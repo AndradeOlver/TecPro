@@ -3,7 +3,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package Vista;
+import Entidades.Producto;
 import Gestores.GestorInventario;
+import java.util.List;
+import javax.swing.table.DefaultTableModel;
 /**
  *
  * @author equipo
@@ -20,6 +23,8 @@ public class FrmProductos extends javax.swing.JFrame {
         
         initComponents();
         this.gestorInventario=gestorCompartido;
+        actualizarTabla();
+        
     }
 
     /**
@@ -32,18 +37,95 @@ public class FrmProductos extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblProductos = new javax.swing.JTable();
+        jLProductos = new javax.swing.JLabel();
+        btnAgregarProducto = new javax.swing.JButton();
+        btnAgregarPedido = new javax.swing.JButton();
+        btnGenerarKardex = new javax.swing.JButton();
+        btnAgregarPrecioVenta = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Productos");
+        setName(""); // NOI18N
+
+        tblProductos.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
+            },
+            new String [] {
+                "ID", "Descripcion", "Precio Compra", "Precio Venta ", "Stock"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(tblProductos);
+        if (tblProductos.getColumnModel().getColumnCount() > 0) {
+            tblProductos.getColumnModel().getColumn(0).setResizable(false);
+            tblProductos.getColumnModel().getColumn(1).setResizable(false);
+            tblProductos.getColumnModel().getColumn(2).setResizable(false);
+            tblProductos.getColumnModel().getColumn(3).setResizable(false);
+            tblProductos.getColumnModel().getColumn(4).setResizable(false);
+        }
+
+        jLProductos.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
+        jLProductos.setText("Productos");
+
+        btnAgregarProducto.setText("Ingresar Nuevo Producto");
+        btnAgregarProducto.addActionListener(this::btnAgregarProductoActionPerformed);
+
+        btnAgregarPedido.setText("Ingresar Nuevo Stock");
+
+        btnGenerarKardex.setText("Generar Tarjeta de Almacen");
+
+        btnAgregarPrecioVenta.setText("Ingresar Precio de Venta");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 954, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap(69, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(btnAgregarPedido)
+                                .addGap(64, 64, 64)
+                                .addComponent(btnGenerarKardex, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnAgregarPrecioVenta, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(74, 74, 74)
+                                .addComponent(btnAgregarProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 884, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(34, 34, 34))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLProductos, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(377, 377, 377))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 589, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(39, 39, 39)
+                .addComponent(jLProductos)
+                .addGap(29, 29, 29)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 412, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnAgregarProducto)
+                    .addComponent(btnAgregarPedido)
+                    .addComponent(btnGenerarKardex)
+                    .addComponent(btnAgregarPrecioVenta))
+                .addGap(37, 37, 37))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -60,12 +142,101 @@ public class FrmProductos extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnAgregarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarProductoActionPerformed
+        // TODO add your handling code here:
+        jdiaIngresarProducto agregar= new jdiaIngresarProducto(this,true);
+        agregar.setLocationRelativeTo(this);
+        agregar.setVisible(true);
+        
+        
+
+    }//GEN-LAST:event_btnAgregarProductoActionPerformed
+
+    // Nuevo método para recibir el texto de la ventana hija
+    public void registrarNuevoProducto(String descripcion) {
+         // 1. Aquí debes guardar el producto en tu gestor. 
+        
+        // Adapta esta línea según cómo funcione tu GestorInventario y tu clase Producto:
+        Producto nuevoProducto = new Producto(descripcion); // Suponiendo este constructor
+        gestorInventario.registrarProducto(nuevoProducto);    // Suponiendo este método
+
+        // 2. UNA VEZ GUARDADO, ahora sí mandamos a actualizar la tabla
+        actualizarTabla();
+    }
+    public void actualizarTabla() {
+        // Capturamos el modelo estructural de la tabla (tblClientes)
+        DefaultTableModel modelo = (DefaultTableModel) tblProductos.getModel();
+       
+        
+        // Reiniciamos las filas a cero para no duplicar los datos visualmente al recargar
+        modelo.setRowCount(0);
+        
+        // Extraemos la memoria temporal y la recorremos
+        List<Producto> lista = gestorInventario.obtenerCatalogoCompleto();
+        
+            for (Producto p : lista) {
+        // Evaluamos si los datos son null para mostrar un texto vacío "" o un guión "-"
+        String txtCompra = (p.getPrecioCompra() == null) ? "Sin asignar" : "$" + p.getPrecioCompra();
+        String txtVenta  = (p.getPrecioVentaBase() == null) ? "Sin asignar" : "$" + p.getPrecioVentaBase();
+        String txtStock  = (p.getStock() == null) ? "0 (Vacio)" : String.valueOf(p.getStock());
+
+        modelo.addRow(new Object[]{
+            p.getId(), 
+            p.getDescripcion(), 
+            txtCompra, // Usamos las variables formateadas
+            txtVenta,
+            txtStock
+        });
+        }
+        ajustarAnchoColumnas();
+    }
+     private void ajustarAnchoColumnas() {
+    // 1. Extraemos el modelo estructural de las columnas de tu tabla
+    javax.swing.table.TableColumnModel modeloColumna = tblProductos.getColumnModel();
+
+    // 2. Recorremos cada una de las columnas
+    for (int i = 0; i < modeloColumna.getColumnCount(); i++) {
+        int anchoCalculado = 50; // Un ancho mínimo por seguridad
+
+        // A. Revisamos cuánto espacio exige el texto del título de la columna
+        javax.swing.table.TableColumn columna = modeloColumna.getColumn(i);
+        javax.swing.table.TableCellRenderer rendererCabecera = columna.getHeaderRenderer();
+        
+        if (rendererCabecera == null) {
+            rendererCabecera = tblProductos.getTableHeader().getDefaultRenderer();
+        }
+        
+        java.awt.Component compCabecera = rendererCabecera.getTableCellRendererComponent(
+            tblProductos, columna.getHeaderValue(), false, false, 0, i);
+        
+        anchoCalculado = Math.max(anchoCalculado, compCabecera.getPreferredSize().width);
+
+        // B. Recorremos todas las filas de esa columna para buscar el texto más largo
+        for (int j = 0; j < tblProductos.getRowCount(); j++) {
+            javax.swing.table.TableCellRenderer rendererCelda = tblProductos.getCellRenderer(j, i);
+            java.awt.Component compCelda = rendererCelda.getTableCellRendererComponent(
+                tblProductos, tblProductos.getValueAt(j, i), false, false, j, i);
+            
+            anchoCalculado = Math.max(anchoCalculado, compCelda.getPreferredSize().width);
+        }
+
+        // C. Le aplicamos el tamaño ganador a la columna, más 10 píxeles de margen estético
+        columna.setPreferredWidth(anchoCalculado + 10);
+    }
+}
     /**
      * @param args the command line arguments
      */
   
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAgregarPedido;
+    private javax.swing.JButton btnAgregarPrecioVenta;
+    private javax.swing.JButton btnAgregarProducto;
+    private javax.swing.JButton btnGenerarKardex;
+    private javax.swing.JLabel jLProductos;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable tblProductos;
     // End of variables declaration//GEN-END:variables
 }
