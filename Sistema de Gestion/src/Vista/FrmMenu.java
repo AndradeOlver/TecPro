@@ -86,7 +86,7 @@ public class FrmMenu extends javax.swing.JFrame {
 
     private void btnAbrirProductosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbrirProductosActionPerformed
         // TODO add your handling code here:
-        FrmProductos ventanaNueva= new FrmProductos(this.gestorInventario);
+        FrmProductos ventanaNueva= new FrmProductos(this.gestorInventario,this.gestorContactos);
         ventanaNueva.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_btnAbrirProductosActionPerformed

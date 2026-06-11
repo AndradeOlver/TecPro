@@ -152,4 +152,13 @@ public class MovimientosKardex {
         
         return registro;
     }
+    // Nuevo método: Calcula el total de dinero de este movimiento específico
+    public double getTotalMovimiento() {
+        return this.cantidadFisica * this.valorUnitario;
+}
+
+    // Nuevo método: Calcula cuánto vale todo el inventario restante
+    public double getValorTotalSaldo() {
+        return this.saldoCantidadActual * this.saldoCostoPromedio;
+}
 }

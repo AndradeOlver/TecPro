@@ -5,6 +5,7 @@
 package Vista;
 import Entidades.Producto;
 import Gestores.GestorInventario;
+import Gestores.GestorContactos;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
 /**
@@ -13,16 +14,18 @@ import javax.swing.table.DefaultTableModel;
  */
 public class FrmProductos extends javax.swing.JFrame {
     private GestorInventario gestorInventario;
+    private GestorContactos gestorContactos;
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrmProductos.class.getName());
 
     /**
      * Creates new form FrmProductos
      */
-    public FrmProductos(GestorInventario gestorCompartido) {
+    public FrmProductos(GestorInventario gestorCompartido,GestorContactos gestorCont) {
         
         initComponents();
         this.gestorInventario=gestorCompartido;
+        this.gestorContactos = gestorCont;
         actualizarTabla();
         
     }
@@ -36,14 +39,19 @@ public class FrmProductos extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPopupMenu1 = new javax.swing.JPopupMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblProductos = new javax.swing.JTable();
         jLProductos = new javax.swing.JLabel();
         btnAgregarProducto = new javax.swing.JButton();
         btnAgregarPedido = new javax.swing.JButton();
-        btnGenerarKardex = new javax.swing.JButton();
         btnAgregarPrecioVenta = new javax.swing.JButton();
+
+        jMenuItem1.setText("Tarjeta de Almacen");
+        jMenuItem1.addActionListener(this::jMenuItem1ActionPerformed);
+        jPopupMenu1.add(jMenuItem1);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Productos");
@@ -68,6 +76,11 @@ public class FrmProductos extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        tblProductos.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                tblProductosMouseReleased(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblProductos);
         if (tblProductos.getColumnModel().getColumnCount() > 0) {
             tblProductos.getColumnModel().getColumn(0).setResizable(false);
@@ -83,9 +96,8 @@ public class FrmProductos extends javax.swing.JFrame {
         btnAgregarProducto.setText("Ingresar Nuevo Producto");
         btnAgregarProducto.addActionListener(this::btnAgregarProductoActionPerformed);
 
-        btnAgregarPedido.setText("Ingresar Nuevo Stock");
-
-        btnGenerarKardex.setText("Generar Tarjeta de Almacen");
+        btnAgregarPedido.setText("Ingresar Nuevo Inventario");
+        btnAgregarPedido.addActionListener(this::btnAgregarPedidoActionPerformed);
 
         btnAgregarPrecioVenta.setText("Ingresar Precio de Venta");
 
@@ -100,11 +112,9 @@ public class FrmProductos extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(btnAgregarPedido)
-                                .addGap(64, 64, 64)
-                                .addComponent(btnGenerarKardex, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(200, 200, 200)
                                 .addComponent(btnAgregarPrecioVenta, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(74, 74, 74)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(btnAgregarProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 884, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(34, 34, 34))
@@ -123,7 +133,6 @@ public class FrmProductos extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAgregarProducto)
                     .addComponent(btnAgregarPedido)
-                    .addComponent(btnGenerarKardex)
                     .addComponent(btnAgregarPrecioVenta))
                 .addGap(37, 37, 37))
         );
@@ -136,7 +145,7 @@ public class FrmProductos extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 626, Short.MAX_VALUE)
         );
 
         pack();
@@ -151,6 +160,53 @@ public class FrmProductos extends javax.swing.JFrame {
         
 
     }//GEN-LAST:event_btnAgregarProductoActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        // TODO add your handling code here:
+      
+        // 1. Extraemos el número de la fila que quedó seleccionada
+        int fila = tblProductos.getSelectedRow();
+    
+        if (fila != -1) { 
+        // 2. Extraemos el ID (Columna 0) y el Nombre (Columna 1)
+        // Usamos Integer.parseInt y .toString() para evitar errores de casteo
+         int idProducto = Integer.parseInt(tblProductos.getValueAt(fila, 0).toString());
+            String nombreProducto = tblProductos.getValueAt(fila, 1).toString();
+        
+        // 3. Abrimos la ventana del Kardex pasándole los datos
+        // OJO: Asume que ya creaste el JDialog llamado jdiaKardex
+            jdialKardex ventanaKardex = new jdialKardex(this, true, idProducto, nombreProducto, gestorInventario);
+            ventanaKardex.setLocationRelativeTo(this);
+            ventanaKardex.setVisible(true);
+    }
+        
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void tblProductosMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblProductosMouseReleased
+        // TODO add your handling code here:
+            // Verifica si fue clic derecho (Popup Trigger)
+        if (evt.isPopupTrigger()) {
+        // Calcula la fila en base a las coordenadas del ratón (X, Y)
+        int filaSeleccionada = tblProductos.rowAtPoint(evt.getPoint());
+        
+        // Fuerza a la tabla a seleccionar esa fila visualmente
+        if (filaSeleccionada >= 0 && filaSeleccionada < tblProductos.getRowCount()) {
+            tblProductos.setRowSelectionInterval(filaSeleccionada, filaSeleccionada);
+            
+            // Muestra tu menú emergente (asumiendo que lo llamaste popMenuEditar)
+            // en la posición exacta del ratón
+            jPopupMenu1.show(evt.getComponent(), evt.getX(), evt.getY());
+        }
+    }
+    }//GEN-LAST:event_tblProductosMouseReleased
+
+    private void btnAgregarPedidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarPedidoActionPerformed
+        // TODO add your handling code here:
+        // Le pasamos el 'this', el 'true', y los DOS gestores
+        jdiaNuevaCompra ventanaCompra = new jdiaNuevaCompra(this, true, gestorInventario, gestorContactos);
+        ventanaCompra.setLocationRelativeTo(this);
+        ventanaCompra.setVisible(true);
+    }//GEN-LAST:event_btnAgregarPedidoActionPerformed
 
     // Nuevo método para recibir el texto de la ventana hija
     public void registrarNuevoProducto(String descripcion) {
@@ -233,9 +289,10 @@ public class FrmProductos extends javax.swing.JFrame {
     private javax.swing.JButton btnAgregarPedido;
     private javax.swing.JButton btnAgregarPrecioVenta;
     private javax.swing.JButton btnAgregarProducto;
-    private javax.swing.JButton btnGenerarKardex;
     private javax.swing.JLabel jLProductos;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tblProductos;
     // End of variables declaration//GEN-END:variables

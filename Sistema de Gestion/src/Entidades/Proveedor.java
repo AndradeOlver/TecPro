@@ -100,5 +100,9 @@ public class Proveedor {
             throw new IllegalArgumentException("Error: El correo de contacto no puede ser nulo.");
         }
     }
+    @Override
+        public String toString() {
+        return this.razonSocial; // O return this.razonSocial; para el Proveedor
+    }
     
 }

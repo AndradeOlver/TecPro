@@ -25,7 +25,7 @@ public class GestorInventario {
         this.catalogoProductos = new ArrayList<>();
         this.historialCompras = new ArrayList<>();
         this.bitacoraKardex = new ArrayList<>();
-        
+       
         cargarDatosDePrueba(); 
     }
 
@@ -142,17 +142,48 @@ public class GestorInventario {
 
     private void cargarDatosDePrueba() {
         try {
-            // Instanciamos productos con un stock base para que no arranquen en 0
-            Producto p1 = new Producto("Laptop Dell Inspiron", 2500.00, 2000.00, 10);
+            // 1. Instanciamos el producto (como ya lo tenías)
+            // Ojo: Lo dejamos con stock final de 8, porque simularemos que entraron 10 y se vendieron 2.
+            Producto p1 = new Producto("Laptop Dell Inspiron", 2500.00, 2000.00, 8); 
+            registrarProducto(p1);
+
+            // ========================================================
+            // 2. SIMULACIÓN DE KARDEX PARA LA LAPTOP (p1)
+            // ========================================================
+        
+            // Movimiento A: El inventario inicial (Entraron 10 laptops el 1 de junio)
+            Entidades.MovimientosKardex mov1 = new Entidades.MovimientosKardex(
+                "2026-06-01",     // Fecha
+                "entrada",        // Tipo
+                10,               // Cantidad que ingresa
+                2000.00,          // Costo unitario de compra
+                10,               // Saldo de cantidad en ese momento
+                2000.00,          // Saldo de costo promedio en ese momento
+                p1                // El producto al que pertenece
+            );
+            this.bitacoraKardex.add(mov1); // Lo guardamos en el archivero
+
+            // Movimiento B: Una venta (Salieron 2 laptops al día siguiente)
+            Entidades.MovimientosKardex mov2 = new Entidades.MovimientosKardex(
+                "2026-06-02",     // Fecha
+                "salida",         // Tipo
+                2,                // Cantidad que sale
+                2000.00,          // Salen costeados al promedio que teníamos (2000)
+                8,                // Saldo de cantidad restante (10 - 2 = 8)
+                2000.00,          // El costo promedio no cambia en las salidas
+                p1                // El producto al que pertenece
+            );  
+            this.bitacoraKardex.add(mov2); // Lo guardamos en el archivero
+
+
+            // 3. Tus otros productos de prueba para que la tabla principal no se vea vacía
             Producto p2 = new Producto("Mouse Inalámbrico Logitech", 80.00, 50.00, 50);
             Producto p3 = new Producto("Monitor LG 24 Pulgadas", 600.00, 450.00, 15);
-            
-            registrarProducto(p1);
             registrarProducto(p2);
             registrarProducto(p3);
-            
+        
         } catch (Exception e) {
-            System.out.println("Error cargando semillas de inventario: " + e.getMessage());
+        System.out.println("Error cargando semillas de inventario: " + e.getMessage());
         }
     }
     
@@ -160,6 +191,7 @@ public class GestorInventario {
     public List<Producto> obtenerCatalogoCompleto() {
         return new ArrayList<>(this.catalogoProductos);
     }
+   
     
     public List<OrdenCompra> obtenerHistorialCompras() {
         return new ArrayList<>(this.historialCompras);

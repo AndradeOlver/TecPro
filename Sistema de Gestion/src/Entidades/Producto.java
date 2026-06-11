@@ -147,5 +147,10 @@ public class Producto {
             return false;
         }
     }
+    @Override
+    public String toString() {
+        // Esto es lo que verá el usuario en el JComboBox de forma elegante
+        return this.descripcion;
+    }
     
 }
