@@ -2,10 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package Vista;
+package Vista.Productos;
 import Entidades.Producto;
 import Gestores.GestorInventario;
 import Gestores.GestorContactos;
+import Vista.FrmMenu;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
 /**
@@ -41,17 +42,23 @@ public class FrmProductos extends javax.swing.JFrame {
 
         jPopupMenu1 = new javax.swing.JPopupMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblProductos = new javax.swing.JTable();
         jLProductos = new javax.swing.JLabel();
         btnAgregarProducto = new javax.swing.JButton();
         btnAgregarPedido = new javax.swing.JButton();
-        btnAgregarPrecioVenta = new javax.swing.JButton();
+        btnRegresar = new javax.swing.JButton();
+        btnProcesarCompra = new javax.swing.JButton();
 
         jMenuItem1.setText("Tarjeta de Almacen");
         jMenuItem1.addActionListener(this::jMenuItem1ActionPerformed);
         jPopupMenu1.add(jMenuItem1);
+
+        jMenuItem2.setText("Modificar Precio Venta");
+        jMenuItem2.addActionListener(this::jMenuItem2ActionPerformed);
+        jPopupMenu1.add(jMenuItem2);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Productos");
@@ -99,7 +106,11 @@ public class FrmProductos extends javax.swing.JFrame {
         btnAgregarPedido.setText("Ingresar Nuevo Inventario");
         btnAgregarPedido.addActionListener(this::btnAgregarPedidoActionPerformed);
 
-        btnAgregarPrecioVenta.setText("Ingresar Precio de Venta");
+        btnRegresar.setText("Regresar");
+        btnRegresar.addActionListener(this::btnRegresarActionPerformed);
+
+        btnProcesarCompra.setText("Procesar Compra");
+        btnProcesarCompra.addActionListener(this::btnProcesarCompraActionPerformed);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -107,18 +118,20 @@ public class FrmProductos extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap(69, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(btnAgregarPedido)
-                                .addGap(200, 200, 200)
-                                .addComponent(btnAgregarPrecioVenta, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(186, 186, 186)
+                                .addComponent(btnProcesarCompra)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(btnAgregarProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 884, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(34, 34, 34))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(btnRegresar, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLProductos, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(377, 377, 377))))
         );
@@ -126,14 +139,16 @@ public class FrmProductos extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addGap(39, 39, 39)
-                .addComponent(jLProductos)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLProductos)
+                    .addComponent(btnRegresar))
                 .addGap(29, 29, 29)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 412, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAgregarProducto)
                     .addComponent(btnAgregarPedido)
-                    .addComponent(btnAgregarPrecioVenta))
+                    .addComponent(btnProcesarCompra))
                 .addGap(37, 37, 37))
         );
 
@@ -145,7 +160,7 @@ public class FrmProductos extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 626, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -157,7 +172,7 @@ public class FrmProductos extends javax.swing.JFrame {
         agregar.setLocationRelativeTo(this);
         agregar.setVisible(true);
         
-        
+        actualizarTabla();
 
     }//GEN-LAST:event_btnAgregarProductoActionPerformed
 
@@ -206,7 +221,56 @@ public class FrmProductos extends javax.swing.JFrame {
         jdiaNuevaCompra ventanaCompra = new jdiaNuevaCompra(this, true, gestorInventario, gestorContactos);
         ventanaCompra.setLocationRelativeTo(this);
         ventanaCompra.setVisible(true);
+        actualizarTabla();
     }//GEN-LAST:event_btnAgregarPedidoActionPerformed
+
+    private void btnRegresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegresarActionPerformed
+        // Buscamos el Menú original (que tiene tus datos) y lo volvemos a encender
+        for (java.awt.Window window : java.awt.Window.getWindows()) {
+        if (window instanceof FrmMenu) {
+            window.setVisible(true);
+            break;
+        }
+        }
+        // Cerramos la ventana actual
+        this.dispose();
+    }//GEN-LAST:event_btnRegresarActionPerformed
+
+    private void btnProcesarCompraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProcesarCompraActionPerformed
+        // TODO add your handling code here:
+        // 1. Instanciamos tu nueva ventana pasándole el gestor que contiene las órdenes
+        jdialGestionarOrdenes gestionar = new jdialGestionarOrdenes(this, true, gestorInventario);
+        gestionar.setLocationRelativeTo(this);
+    
+        // 2. Mostramos la ventana (El sistema de productos se pausa en esta línea)
+        gestionar.setVisible(true);
+    
+        // 3. Cuando el usuario cierra la gestión, actualizamos el inventario visualmente
+        actualizarTabla();
+    }//GEN-LAST:event_btnProcesarCompraActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        // TODO add your handling code here:
+        // 1. Extraemos el número de la fila que quedó seleccionada con el clic derecho
+        int fila = tblProductos.getSelectedRow();
+        
+        if (fila != -1) { 
+            // 2. Extraemos el ID del producto (Columna 0)
+            int idProducto = Integer.parseInt(tblProductos.getValueAt(fila, 0).toString());
+            
+            // 3. Abrimos la ventanita pasándole el ID y el Gestor
+            jdialPrecioVenta ventanaPrecio = new jdialPrecioVenta(this, true, idProducto, gestorInventario);
+            ventanaPrecio.setLocationRelativeTo(this);
+            
+            // El programa se pausa aquí hasta que el usuario le dé a "Agregar" y se cierre
+            ventanaPrecio.setVisible(true);
+            
+            // 4. Apenas se cierra la ventanita, repintamos la tabla para ver el nuevo precio
+            actualizarTabla();
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this, "Seleccione un producto haciendo clic en la fila primero.");
+        }
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     // Nuevo método para recibir el texto de la ventana hija
     public void registrarNuevoProducto(String descripcion) {
@@ -232,8 +296,8 @@ public class FrmProductos extends javax.swing.JFrame {
         
             for (Producto p : lista) {
         // Evaluamos si los datos son null para mostrar un texto vacío "" o un guión "-"
-        String txtCompra = (p.getPrecioCompra() == null) ? "Sin asignar" : "$" + p.getPrecioCompra();
-        String txtVenta  = (p.getPrecioVentaBase() == null) ? "Sin asignar" : "$" + p.getPrecioVentaBase();
+        String txtCompra = (p.getPrecioCompra() == null) ? "Sin asignar" : "s/" + p.getPrecioCompra();
+        String txtVenta  = (p.getPrecioVentaBase() == null) ? "Sin asignar" : "s/" + p.getPrecioVentaBase();
         String txtStock  = (p.getStock() == null) ? "0 (Vacio)" : String.valueOf(p.getStock());
 
         modelo.addRow(new Object[]{
@@ -287,10 +351,12 @@ public class FrmProductos extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregarPedido;
-    private javax.swing.JButton btnAgregarPrecioVenta;
     private javax.swing.JButton btnAgregarProducto;
+    private javax.swing.JButton btnProcesarCompra;
+    private javax.swing.JButton btnRegresar;
     private javax.swing.JLabel jLProductos;
     private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JScrollPane jScrollPane1;

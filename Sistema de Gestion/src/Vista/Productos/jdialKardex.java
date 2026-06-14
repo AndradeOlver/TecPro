@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
  */
-package Vista;
+package Vista.Productos;
 
 import Gestores.GestorInventario;
 import java.util.List;
@@ -108,7 +108,6 @@ public class jdialKardex extends javax.swing.JDialog {
         jTitulo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(987, 626));
         setSize(new java.awt.Dimension(987, 626));
 
         jPanel1.setPreferredSize(new java.awt.Dimension(987, 626));

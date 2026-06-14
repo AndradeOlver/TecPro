@@ -56,11 +56,24 @@ public class Producto {
     }
 
     public void setPrecioVentaBase(Double precioVentaBase) {
-        if (precioVentaBase ==null||precioVentaBase > 0) {
-            this.precioVentaBase = precioVentaBase;
-        } else {
+        // 1. Permitimos nulos para cuando el producto recién se crea sin precios
+        if (precioVentaBase == null) {
+            this.precioVentaBase = null;
+            return;
+        }
+        
+        // 2. Validación matemática básica
+        if (precioVentaBase <= 0) {
             throw new IllegalArgumentException("Error: El precio de venta base debe ser mayor a 0.");
         }
+        
+        // 3. LA REGLA DE NEGOCIO (Blindaje interno)
+        if (this.precioCompra != null && precioVentaBase <= this.precioCompra) {
+            throw new IllegalArgumentException("Error: El precio de venta (S/ " + precioVentaBase + 
+                                               ") debe ser mayor al precio de compra actual (S/ " + this.precioCompra + ").");
+        }
+
+        this.precioVentaBase = precioVentaBase;
     }
 
     public Double getPrecioCompra() {
@@ -134,19 +147,7 @@ public class Producto {
         // Actualizamos la variable de la clase
         this.setPrecioCompra(nuevoCostoPromedio);
     }
-    public boolean validarPrecioVenta(double precioPropuesto) {
-        
-        if (this.precioCompra == null) {
-            return true; 
-        }
-        
-        if (precioPropuesto > this.precioCompra) {
-            return true;
-        } else {
-
-            return false;
-        }
-    }
+    
     @Override
     public String toString() {
         // Esto es lo que verá el usuario en el JComboBox de forma elegante

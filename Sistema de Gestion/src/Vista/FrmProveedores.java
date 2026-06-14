@@ -502,10 +502,15 @@ public class FrmProveedores extends javax.swing.JFrame {
     }//GEN-LAST:event_itemEditarActionPerformed
 
     private void btnRegresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegresarActionPerformed
-        // TODO add your handling code here:
-        FrmMenu ventanaMenu=new FrmMenu();
-        ventanaMenu.setVisible(true);
-        this.setVisible(false);
+   // Buscamos el Menú original (que tiene tus datos) y lo volvemos a encender
+    for (java.awt.Window window : java.awt.Window.getWindows()) {
+        if (window instanceof FrmMenu) {
+            window.setVisible(true);
+            break;
+        }
+    }
+    // Cerramos la ventana actual
+    this.dispose();
     }//GEN-LAST:event_btnRegresarActionPerformed
       // 4. Lógica de Lectura Visual (El puente entre la lista y la pantalla)
     private void actualizarTabla() {

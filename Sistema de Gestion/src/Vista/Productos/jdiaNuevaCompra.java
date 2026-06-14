@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
  */
-package Vista;
+package Vista.Productos;
 
 import Entidades.LoteProducto;
 import Entidades.OrdenCompra;
@@ -69,6 +69,8 @@ public class jdiaNuevaCompra extends javax.swing.JDialog {
         btnBuscarProveedor = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
+        cmbEstado = new javax.swing.JComboBox<>();
+        jLabel5 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -122,14 +124,14 @@ public class jdiaNuevaCompra extends javax.swing.JDialog {
 
         jLabel4.setText("Proveedor");
 
+        cmbEstado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Solicitada", "Pendiente", "Procesada", "Abonada" }));
+
+        jLabel5.setText("Estado");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(45, 45, 45)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 628, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(31, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -160,10 +162,18 @@ public class jdiaNuevaCompra extends javax.swing.JDialog {
                 .addGap(47, 47, 47)
                 .addComponent(btnAgregarAlCarrito)
                 .addGap(40, 40, 40))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(45, 45, 45)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 628, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(31, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(65, 65, 65)
+                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(cmbEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnProcesarCompra)
-                .addGap(283, 283, 283))
+                .addGap(67, 67, 67))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -198,7 +208,10 @@ public class jdiaNuevaCompra extends javax.swing.JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 7, Short.MAX_VALUE)))
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 249, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnProcesarCompra)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnProcesarCompra)
+                    .addComponent(cmbEstado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5))
                 .addGap(15, 15, 15))
         );
 
@@ -244,34 +257,37 @@ public class jdiaNuevaCompra extends javax.swing.JDialog {
     }//GEN-LAST:event_btnAgregarAlCarritoActionPerformed
 
     private void btnProcesarCompraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProcesarCompraActionPerformed
-    // Validación temprana
-        if (carritoTemporal.isEmpty()) {
+    if (carritoTemporal.isEmpty()) {
             javax.swing.JOptionPane.showMessageDialog(this, "El carrito de compras está vacío.", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         try {
-            // 1. Validamos usando la variable temporal que nos dio la lupa (NO el JComboBox)
             if(this.proveedorSeleccionadoTemporal == null){
                 javax.swing.JOptionPane.showMessageDialog(this, "Debe seleccionar un proveedor válido.");
                 return;
             }
 
-            // 2. Instanciamos la Orden inyectando el proveedor real
-            // (Nota: Simulamos la fecha para la prueba)
-            Entidades.OrdenCompra nuevaOrden = new Entidades.OrdenCompra("2026-06-10", "Pendiente", this.proveedorSeleccionadoTemporal); 
+            // 1. Extraemos el estado (que ahora no incluye 'Cancelada' gracias al diseño visual)
+            String estadoSeleccionado = cmbEstado.getSelectedItem().toString();
             
-            // 3. Traspasamos los lotes a la Orden oficial
+            // 2. Creamos la orden
+            Entidades.OrdenCompra nuevaOrden = new Entidades.OrdenCompra(java.time.LocalDate.now().toString(), estadoSeleccionado, this.proveedorSeleccionadoTemporal); 
+            
             for (Entidades.LoteProducto lote : carritoTemporal) {
                 nuevaOrden.agregarLote(lote);
             }
             
-             // 4. Delegamos el trabajo pesado al Gestor (Registro y Matemáticas)
+            // 3. Registramos
             gestorInventario.registrarOrdenCompra(nuevaOrden);
-            gestorInventario.procesarEntradaAlmacen(nuevaOrden);
             
-            javax.swing.JOptionPane.showMessageDialog(this, "¡Compra procesada con éxito! Stock y costos actualizados.");
-            this.dispose(); // Cerramos la ventana emergente
+            // 4. Actualizamos el Kardex SOLO si la mercadería ya entró al almacén
+            if (estadoSeleccionado.equals("Procesada") || estadoSeleccionado.equals("Abonada")) {
+                gestorInventario.procesarStockKardex(nuevaOrden.getCodigo());
+            }
+            
+            javax.swing.JOptionPane.showMessageDialog(this, "¡Compra registrada con éxito como: " + estadoSeleccionado + "!");
+            this.dispose(); 
             
         } catch (Exception ex) {
             javax.swing.JOptionPane.showMessageDialog(this, "Error al procesar: " + ex.getMessage(), "Error Crítico", javax.swing.JOptionPane.ERROR_MESSAGE);
@@ -348,10 +364,12 @@ public class jdiaNuevaCompra extends javax.swing.JDialog {
     private javax.swing.JButton btnBuscarProducto;
     private javax.swing.JButton btnBuscarProveedor;
     private javax.swing.JButton btnProcesarCompra;
+    private javax.swing.JComboBox<String> cmbEstado;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField txtCantidad;

@@ -89,34 +89,41 @@ public class GestorInventario {
         this.historialCompras.add(nuevaOrden);
     }
 
-    public void procesarEntradaAlmacen(OrdenCompra orden) {
-        // 1. Buscamos la orden en nuestra lista para asegurar que existe
-        OrdenCompra ordenGuardada = null;
+    public OrdenCompra buscarOrdenPorCodigo(int codigo) {
         for (OrdenCompra oc : historialCompras) {
-            if (oc.getCodigo() == orden.getCodigo()) {
-                ordenGuardada = oc;
-                break;
+             if (oc.getCodigo() == codigo) return oc;
+         }
+         return null;
+     }
+
+    public void procesarStockKardex(int codigoOrden) {
+        OrdenCompra orden = buscarOrdenPorCodigo(codigoOrden);
+        if (orden != null && orden.getEstado().equals("Procesada")) {
+            // Esto ejecuta la matemática y crea el historial del Kardex
+            List<Entidades.MovimientosKardex> nuevosMovimientos = orden.procesarEntradaAlmacen();
+            if (nuevosMovimientos != null && !nuevosMovimientos.isEmpty()) {
+                this.bitacoraKardex.addAll(nuevosMovimientos);
             }
         }
+    }
 
-        if (ordenGuardada == null) {
-            throw new IllegalArgumentException("Error: La orden de compra no está registrada en el sistema.");
+    public void avanzarEstadoOrden(int codigoOrden) {
+        OrdenCompra orden = buscarOrdenPorCodigo(codigoOrden);
+        if (orden == null) throw new IllegalArgumentException("Orden no encontrada.");
+        
+        orden.avanzarEstado(); 
+        
+        // Si al avanzar llegó a Procesada, automáticamente sube el stock
+        if (orden.getEstado().equals("Procesada")) {
+            procesarStockKardex(codigoOrden);
         }
+    }
 
-        // 2. Disparamos la lógica interna de la orden (que ya programaste en la entidad)
-        // Esto confirmará el estado y ejecutará el promedio ponderado de los productos
-        ordenGuardada.confirmarIngreso();
-        
-        // 3. Procesamos la entrada y ATRAPAMOS los registros que nos devuelve la orden
-        List<MovimientosKardex> nuevosMovimientos = ordenGuardada.procesarEntradaAlmacen();
-        
-        // 4. GUARDAMOS DEFINITIVAMENTE los registros en el archivero (Kardex global)
-        if (nuevosMovimientos != null && !nuevosMovimientos.isEmpty()) {
-            this.bitacoraKardex.addAll(nuevosMovimientos);
+    public void cancelarOrden(int codigoOrden) {
+        OrdenCompra orden = buscarOrdenPorCodigo(codigoOrden);
+        if (orden != null) {
+            orden.cancelarOrden();
         }
-        
-        // Nota Arquitectónica: En una versión con Base de Datos, aquí llamarías
-        // a un método para guardar los nuevos MovimientosKardex generados en SQL.
     }
 
     // ==========================================

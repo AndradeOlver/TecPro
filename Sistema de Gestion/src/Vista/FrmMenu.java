@@ -4,6 +4,7 @@
  */
 package Vista;
 
+import Vista.Productos.FrmProductos;
 import Gestores.GestorContactos;
 import Gestores.GestorInventario;
 

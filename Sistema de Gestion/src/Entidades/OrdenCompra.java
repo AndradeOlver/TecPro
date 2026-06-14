@@ -57,8 +57,11 @@ public class OrdenCompra {
         }
     }
     public String getEstado() { return estado; }
+    
     public void setEstado(String estado) {
-        if (estado.equals("Pendiente") || estado.equals("Procesada") || estado.equals("Cancelada")) {
+        if (estado.equals("Solicitada") || estado.equals("Pendiente") || 
+            estado.equals("Procesada") || estado.equals("Abonada") || 
+            estado.equals("Cancelada")) {
             this.estado = estado;
         } else {
             throw new IllegalArgumentException("Error: Estado de orden inválido.");
@@ -90,12 +93,18 @@ public class OrdenCompra {
             return false;
         }
     }
-    public void confirmarIngreso() {
-        if (this.estado.equals("Pendiente")) {
+    public void avanzarEstado() {
+        if (this.estado.equals("Solicitada")) {
+            this.setEstado("Pendiente");
+        } else if (this.estado.equals("Pendiente")) {
             this.setEstado("Procesada");
         } else {
-            throw new IllegalStateException("Error: Esta orden ya fue procesada o no está pendiente.");
+            throw new IllegalStateException("La orden no puede avanzar. Estado actual: " + this.estado);
         }
+    }
+
+    public void cancelarOrden() {
+        this.setEstado("Cancelada");
     }
     public void agregarLote(LoteProducto lote) {
         if (lote != null) {

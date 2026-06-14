@@ -1,0 +1,156 @@
+Listado de rutas de carpetas para el volumen Nuevo vol
+El n£mero de serie del volumen es 6832-9497
+D:.
+³   build.xml
+³   manifest.mf
+³   mapa.txt
+³   todo_el_codigo.txt
+³   
+ÃÄÄÄbuild
+³   ³   built-jar.properties
+³   ³   
+³   ÃÄÄÄclasses
+³   ³   ÃÄÄÄEntidades
+³   ³   ³       Cliente.class
+³   ³   ³       DetallePedido.class
+³   ³   ³       LoteProducto.class
+³   ³   ³       MovimientosKardex.class
+³   ³   ³       OrdenCompra.class
+³   ³   ³       PagoAbono.class
+³   ³   ³       Pedido.class
+³   ³   ³       Producto.class
+³   ³   ³       Proveedor.class
+³   ³   ³       
+³   ³   ÃÄÄÄGestores
+³   ³   ³       GestorContactos.class
+³   ³   ³       GestorInventario.class
+³   ³   ³       GestorVentas.class
+³   ³   ³       
+³   ³   ÃÄÄÄImagenes
+³   ³   ³       add.png
+³   ³   ³       clear.png
+³   ³   ³       delete.png
+³   ³   ³       edit.png
+³   ³   ³       icon.png
+³   ³   ³       search.png
+³   ³   ³       
+³   ³   ÀÄÄÄVista
+³   ³       ³   FrmClientes$1.class
+³   ³       ³   FrmClientes$2.class
+³   ³       ³   FrmClientes.class
+³   ³       ³   FrmMenu.class
+³   ³       ³   FrmProductos$1.class
+³   ³       ³   FrmProductos$2.class
+³   ³       ³   FrmProductos.class
+³   ³       ³   FrmProveedores$1.class
+³   ³       ³   FrmProveedores$2.class
+³   ³       ³   FrmProveedores.class
+³   ³       ³   jdiaIngresarProducto.class
+³   ³       ³   jdialBuscarProducto$1.class
+³   ³       ³   jdialBuscarProducto$2.class
+³   ³       ³   jdialBuscarProducto.class
+³   ³       ³   jdialBuscarProveedor$1.class
+³   ³       ³   jdialBuscarProveedor$2.class
+³   ³       ³   jdialBuscarProveedor.class
+³   ³       ³   jdialGestionarOrdenes$1$1.class
+³   ³       ³   jdialGestionarOrdenes$1.class
+³   ³       ³   jdialGestionarOrdenes$2$1.class
+³   ³       ³   jdialGestionarOrdenes$2.class
+³   ³       ³   jdialGestionarOrdenes.class
+³   ³       ³   jdialKardex$1.class
+³   ³       ³   jdialKardex.class
+³   ³       ³   jdialPrecioVenta$1$1.class
+³   ³       ³   jdialPrecioVenta$1.class
+³   ³       ³   jdialPrecioVenta.class
+³   ³       ³   jdiaNuevaCompra$1.class
+³   ³       ³   jdiaNuevaCompra.class
+³   ³       ³   
+³   ³       ÀÄÄÄProductos
+³   ³               FrmProductos$1.class
+³   ³               FrmProductos$2.class
+³   ³               FrmProductos.class
+³   ³               jdiaIngresarProducto.class
+³   ³               jdialBuscarProducto$1.class
+³   ³               jdialBuscarProducto$2.class
+³   ³               jdialBuscarProducto.class
+³   ³               jdialBuscarProveedor$1.class
+³   ³               jdialBuscarProveedor$2.class
+³   ³               jdialBuscarProveedor.class
+³   ³               jdialGestionarOrdenes$1.class
+³   ³               jdialGestionarOrdenes$2.class
+³   ³               jdialGestionarOrdenes.class
+³   ³               jdialKardex$1.class
+³   ³               jdialKardex.class
+³   ³               jdialPrecioVenta.class
+³   ³               jdiaNuevaCompra$1.class
+³   ³               jdiaNuevaCompra.class
+³   ³               
+³   ÃÄÄÄempty
+³   ÀÄÄÄgenerated-sources
+³       ÀÄÄÄap-source-output
+ÃÄÄÄdist
+³       README.TXT
+³       Sistema_de_Gestion.jar
+³       
+ÃÄÄÄnbproject
+³   ³   build-impl.xml
+³   ³   genfiles.properties
+³   ³   project.properties
+³   ³   project.xml
+³   ³   
+³   ÀÄÄÄprivate
+³           private.properties
+³           private.xml
+³           
+ÃÄÄÄsrc
+³   ÃÄÄÄEntidades
+³   ³       Cliente.java
+³   ³       DetallePedido.java
+³   ³       LoteProducto.java
+³   ³       MovimientosKardex.java
+³   ³       OrdenCompra.java
+³   ³       PagoAbono.java
+³   ³       Pedido.java
+³   ³       Producto.java
+³   ³       Proveedor.java
+³   ³       
+³   ÃÄÄÄGestores
+³   ³       GestorContactos.java
+³   ³       GestorInventario.java
+³   ³       GestorVentas.java
+³   ³       
+³   ÃÄÄÄImagenes
+³   ³       add.png
+³   ³       clear.png
+³   ³       delete.png
+³   ³       edit.png
+³   ³       icon.png
+³   ³       search.png
+³   ³       
+³   ÀÄÄÄVista
+³       ³   FrmClientes.form
+³       ³   FrmClientes.java
+³       ³   FrmMenu.form
+³       ³   FrmMenu.java
+³       ³   FrmProveedores.form
+³       ³   FrmProveedores.java
+³       ³   
+³       ÀÄÄÄProductos
+³               FrmProductos.form
+³               FrmProductos.java
+³               jdiaIngresarProducto.form
+³               jdiaIngresarProducto.java
+³               jdialBuscarProducto.form
+³               jdialBuscarProducto.java
+³               jdialBuscarProveedor.form
+³               jdialBuscarProveedor.java
+³               jdialGestionarOrdenes.form
+³               jdialGestionarOrdenes.java
+³               jdialKardex.form
+³               jdialKardex.java
+³               jdialPrecioVenta.form
+³               jdialPrecioVenta.java
+³               jdiaNuevaCompra.form
+³               jdiaNuevaCompra.java
+³               
+ÀÄÄÄtest
