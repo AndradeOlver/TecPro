@@ -7,6 +7,7 @@ package Vista;
 import Vista.Productos.FrmProductos;
 import Gestores.GestorContactos;
 import Gestores.GestorInventario;
+import Gestores.GestorVentas;
 
 /**
  *
@@ -15,6 +16,7 @@ import Gestores.GestorInventario;
 public class FrmMenu extends javax.swing.JFrame {
     private GestorContactos gestorContactos = new GestorContactos();
      private GestorInventario gestorInventario= new GestorInventario();
+     private GestorVentas gestorVentas = new Gestores.GestorVentas();
             
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrmMenu.class.getName());
 
@@ -34,14 +36,14 @@ public class FrmMenu extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        btnAbrirClientes = new javax.swing.JButton();
+        btnAbrirAreaVentas = new javax.swing.JButton();
         btnAbrirProductos = new javax.swing.JButton();
         btnAbrirProveedores = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        btnAbrirClientes.setText("Clientes");
-        btnAbrirClientes.addActionListener(this::btnAbrirClientesActionPerformed);
+        btnAbrirAreaVentas.setText("Area ventas");
+        btnAbrirAreaVentas.addActionListener(this::btnAbrirAreaVentasActionPerformed);
 
         btnAbrirProductos.setText("Productos");
         btnAbrirProductos.addActionListener(this::btnAbrirProductosActionPerformed);
@@ -54,36 +56,36 @@ public class FrmMenu extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(114, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnAbrirProductos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnAbrirClientes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnAbrirProveedores, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(39, 39, 39))
+                .addContainerGap(139, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(btnAbrirProductos, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnAbrirAreaVentas, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnAbrirProveedores))
+                .addGap(14, 14, 14))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(38, 38, 38)
-                .addComponent(btnAbrirClientes)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addContainerGap(40, Short.MAX_VALUE)
+                .addComponent(btnAbrirAreaVentas)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnAbrirProveedores)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnAbrirProductos)
-                .addGap(35, 35, 35))
+                .addGap(41, 41, 41))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnAbrirClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbrirClientesActionPerformed
+    private void btnAbrirAreaVentasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbrirAreaVentasActionPerformed
         // TODO add your handling code here:
         
-        FrmClientes ventanaNueva = new FrmClientes(this.gestorContactos);
+        FrmAreaVentas ventanaNueva = new FrmAreaVentas(this.gestorVentas, this.gestorContactos, this.gestorInventario);
         ventanaNueva.setVisible(true);
         this.setVisible(false);
         
-    }//GEN-LAST:event_btnAbrirClientesActionPerformed
+    }//GEN-LAST:event_btnAbrirAreaVentasActionPerformed
 
     private void btnAbrirProductosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbrirProductosActionPerformed
         // TODO add your handling code here:
@@ -125,7 +127,7 @@ public class FrmMenu extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnAbrirClientes;
+    private javax.swing.JButton btnAbrirAreaVentas;
     private javax.swing.JButton btnAbrirProductos;
     private javax.swing.JButton btnAbrirProveedores;
     // End of variables declaration//GEN-END:variables

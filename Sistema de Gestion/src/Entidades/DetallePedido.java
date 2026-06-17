@@ -25,6 +25,13 @@ public class DetallePedido {
         setCantidadVendida(cantidadVendida);
         
         setProducto(producto);
+        if (producto != null && producto.getPrecioCompra() != null) {
+            if (precioVentaCongelado <= producto.getPrecioCompra()) {
+                throw new IllegalArgumentException("Error: El precio de venta (S/ " + precioVentaCongelado + 
+                                                   ") debe ser mayor al precio de compra actual (S/ " + 
+                                                   producto.getPrecioCompra() + ").");
+            }
+        }
    
         if (precioVentaCongelado >= 0) {
             this.precioVentaCongelado = precioVentaCongelado;

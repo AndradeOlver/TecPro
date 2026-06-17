@@ -24,8 +24,8 @@ public class jdiaNuevaCompra extends javax.swing.JDialog {
     private List<LoteProducto> carritoTemporal;
     private GestorContactos gestorContactos;
     
-    private Entidades.Producto productoSeleccionadoTemporal = null;
-    private Entidades.Proveedor proveedorSeleccionadoTemporal = null;
+    private Producto productoSeleccionadoTemporal = null;
+    private Proveedor proveedorSeleccionadoTemporal = null;
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(jdiaNuevaCompra.class.getName());
 
