@@ -18,9 +18,27 @@ public class ProductoDAO {
             
             ps.setInt(1, p.getId());
             ps.setString(2, p.getDescripcion());
-            ps.setDouble(3, p.getPrecioVentaBase());
-            ps.setDouble(4, p.getPrecioCompra());
-            ps.setInt(5, p.getStock());
+            
+            // Validación para Precio de Venta
+            if (p.getPrecioVentaBase() != null) {
+                ps.setDouble(3, p.getPrecioVentaBase());
+            } else {
+                ps.setNull(3, java.sql.Types.DECIMAL);
+            }
+            
+            // Validación para Precio de Compra
+            if (p.getPrecioCompra() != null) {
+                ps.setDouble(4, p.getPrecioCompra());
+            } else {
+                ps.setNull(4, java.sql.Types.DECIMAL);
+            }
+            
+            // Validación para Stock
+            if (p.getStock() != null) {
+                ps.setInt(5, p.getStock());
+            } else {
+                ps.setNull(5, java.sql.Types.INTEGER);
+            }
             
             ps.execute();
             return true;
@@ -102,14 +120,33 @@ public class ProductoDAO {
     }
 
     public boolean actualizar(Producto p) {
-        String sql = "UPDATE Producto SET Descripcion=?, PrecioVentaBase=?, PrecioCompra=?, Stock=? WHERE ID=?";
+     String sql = "UPDATE Producto SET Descripcion=?, PrecioVentaBase=?, PrecioCompra=?, Stock=? WHERE ID=?";
         try (Connection con = ConexionSQL.probarConexion(); 
              PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setString(1, p.getDescripcion());
-            ps.setDouble(2, p.getPrecioVentaBase());
-            ps.setDouble(3, p.getPrecioCompra());
-            ps.setInt(4, p.getStock());
+            
+            // Validación para Precio de Venta
+            if (p.getPrecioVentaBase() != null) {
+                ps.setDouble(2, p.getPrecioVentaBase());
+            } else {
+                ps.setNull(2, java.sql.Types.DECIMAL);
+            }
+            
+            // Validación para Precio de Compra
+            if (p.getPrecioCompra() != null) {
+                ps.setDouble(3, p.getPrecioCompra());
+            } else {
+                ps.setNull(3, java.sql.Types.DECIMAL);
+            }
+            
+            // Validación para Stock
+            if (p.getStock() != null) {
+                ps.setInt(4, p.getStock());
+            } else {
+                ps.setNull(4, java.sql.Types.INTEGER);
+            }
+            
             ps.setInt(5, p.getId());
             
             ps.execute();
