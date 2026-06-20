@@ -320,7 +320,7 @@ public class FrmPedido extends javax.swing.JFrame {
             
             // 4. Registramos en el cliente y en el historial global de ventas
             this.clienteSeleccionadoTemporal.getPedidos().add(nuevoPedido);
-            gestorVentas.registrarPedido(nuevoPedido);
+            gestorVentas.registrarVenta(nuevoPedido);
 
             javax.swing.JOptionPane.showMessageDialog(this, "¡Pedido de venta registrado con éxito!");
             this.dispose();
@@ -331,17 +331,16 @@ public class FrmPedido extends javax.swing.JFrame {
     }//GEN-LAST:event_btnProcesarCompraActionPerformed
 
     private void btnRegresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegresarActionPerformed
-        // TODO add your handling code here:
-        // Buscamos el Área de Ventas original (que tiene los gestores vivos) y lo encendemos
-        for (java.awt.Window window : java.awt.Window.getWindows()) {
-            if (window instanceof FrmAreaVentas) {
-                window.setVisible(true);
-                break;
-            }
+       // Buscamos el Menú principal en la memoria de Java y lo volvemos a encender
+    for (java.awt.Window window : java.awt.Window.getWindows()) {
+        if (window instanceof Vista.FrmMenu) {
+            window.setVisible(true);
+            break;
         }
-        
-        // Cerramos la ventana actual (la del pedido)
-        this.dispose();
+    }
+    
+    // Cerramos y destruimos la ventana actual en la que estamos
+    this.dispose();
     }//GEN-LAST:event_btnRegresarActionPerformed
       private void actualizarTablaCarrito() {
         javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) jTable1.getModel();

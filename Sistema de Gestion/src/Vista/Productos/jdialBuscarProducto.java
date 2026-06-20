@@ -135,7 +135,7 @@ public class jdialBuscarProducto extends javax.swing.JDialog {
     
         if (textoBusqueda.isEmpty()) {
             // Si no escribió nada, mostramos todos los productos
-            listaResultados = gestor.obtenerCatalogoCompleto();
+            listaResultados = gestor.obtenerTodosLosProductos();
         } else {
             // Si escribió algo, usamos tu método de búsqueda ambigua
             listaResultados = gestor.buscarProductoPorDescripcion(textoBusqueda);

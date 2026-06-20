@@ -122,6 +122,9 @@ public class Pedido {
             throw new IllegalArgumentException("Error: El pedido debe pertenecer a un cliente válido (no nulo).");
         }
     }
+    public List<DetallePedido> getDetalles() {
+    return this.detallesVenta;
+}
     
     private boolean esFechaMayor(String fechaBase, String fechaAComparar) {
         if (fechaBase == null || fechaAComparar == null) return false;

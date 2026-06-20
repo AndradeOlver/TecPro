@@ -15,21 +15,35 @@ public class Producto {
     private Double precioVentaBase;
     private Double precioCompra;
     private Integer stock;
-    public Producto( String descripcion, double precioVentaBase, double precioCompra, int stock) {
-        
+    
+    // 1. CONSTRUCTOR PARA CREAR PRODUCTOS NUEVOS DESDE LA INTERFAZ
+    public Producto(String descripcion, double precioVentaBase, double precioCompra, int stock) {
         this.id = contadorGlobal++;
         setDescripcion(descripcion);
+        setPrecioCompra(precioCompra); // IMPORTANTE: Setear compra primero para la validación
         setPrecioVentaBase(precioVentaBase);
-        setPrecioCompra(precioCompra);
         setStock(stock);
     }
-     public Producto( String descripcion) {
-        
+
+    // 2. CONSTRUCTOR PARA PRODUCTOS VACÍOS (Borradores)
+    public Producto(String descripcion) {
         this.id = contadorGlobal++;
         setDescripcion(descripcion);
-        this.precioVentaBase=null;
-        this.precioCompra=null;
-        this.stock=null;
+        this.precioVentaBase = null;
+        this.precioCompra = null;
+        this.stock = null;
+    }
+
+    // 3. ¡NUEVO! CONSTRUCTOR PARA EL DAO (Carga datos desde SQL Server)
+    public Producto(int id, String descripcion, Double precioVentaBase, Double precioCompra, Integer stock) {
+        this.id = id; // Usamos el ID real de la base de datos
+        setDescripcion(descripcion);
+        
+        // Asignación directa para datos que ya vienen validados de la BD
+        this.precioCompra = precioCompra;
+        this.precioVentaBase = precioVentaBase;
+        this.stock = stock;
+        this.stock = stock;
     }
 
 

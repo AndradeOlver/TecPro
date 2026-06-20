@@ -225,15 +225,16 @@ public class FrmProductos extends javax.swing.JFrame {
     }//GEN-LAST:event_btnAgregarPedidoActionPerformed
 
     private void btnRegresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegresarActionPerformed
-        // Buscamos el Menú original (que tiene tus datos) y lo volvemos a encender
-        for (java.awt.Window window : java.awt.Window.getWindows()) {
-        if (window instanceof FrmMenu) {
+        // Buscamos el Menú principal en la memoria de Java y lo volvemos a encender
+    for (java.awt.Window window : java.awt.Window.getWindows()) {
+        if (window instanceof Vista.FrmMenu) {
             window.setVisible(true);
             break;
         }
-        }
-        // Cerramos la ventana actual
-        this.dispose();
+    }
+    
+    // Cerramos y destruimos la ventana actual en la que estamos
+    this.dispose();
     }//GEN-LAST:event_btnRegresarActionPerformed
 
     private void btnProcesarCompraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProcesarCompraActionPerformed
@@ -292,8 +293,7 @@ public class FrmProductos extends javax.swing.JFrame {
         modelo.setRowCount(0);
         
         // Extraemos la memoria temporal y la recorremos
-        List<Producto> lista = gestorInventario.obtenerCatalogoCompleto();
-        
+        List<Producto> lista = gestorInventario.obtenerTodosLosProductos();         
             for (Producto p : lista) {
         // Evaluamos si los datos son null para mostrar un texto vacío "" o un guión "-"
         String txtCompra = (p.getPrecioCompra() == null) ? "Sin asignar" : "s/" + p.getPrecioCompra();

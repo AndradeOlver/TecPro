@@ -32,6 +32,15 @@ public class MovimientosKardex {
         setSaldoCostoPromedio(saldoCostoPromedio);
         setProducto(producto);
     }
+    public MovimientosKardex(int idMovimiento, String fechaMovimiento, String tipoMovimiento, int cantidadFisica, double valorUnitario, int saldoCantidadActual, double saldoCostoPromedio) {
+        this.idMovimiento = idMovimiento;
+        this.fechaMovimiento = fechaMovimiento;
+        this.tipoMovimiento = tipoMovimiento;
+        this.cantidadFisica = cantidadFisica;
+        this.valorUnitario = valorUnitario;
+        this.saldoCantidadActual = saldoCantidadActual;
+        this.saldoCostoPromedio = saldoCostoPromedio;
+    }
     public int getIdMovimiento() { 
         return idMovimiento; 
     }

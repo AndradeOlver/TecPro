@@ -14,9 +14,9 @@ import Gestores.GestorVentas;
  * @author equipo
  */
 public class FrmMenu extends javax.swing.JFrame {
-    private GestorContactos gestorContactos = new GestorContactos();
-     private GestorInventario gestorInventario= new GestorInventario();
-     private GestorVentas gestorVentas = new Gestores.GestorVentas();
+   private GestorContactos gestorContactos = new GestorContactos();
+    private GestorInventario gestorInventario = new GestorInventario();
+    private GestorVentas gestorVentas = new Gestores.GestorVentas();
             
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrmMenu.class.getName());
 
@@ -36,70 +36,95 @@ public class FrmMenu extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        btnAbrirAreaVentas = new javax.swing.JButton();
-        btnAbrirProductos = new javax.swing.JButton();
-        btnAbrirProveedores = new javax.swing.JButton();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        jmnAreaVentas = new javax.swing.JMenu();
+        jmiGestionarClientes = new javax.swing.JMenuItem();
+        jmiGenerarPedido = new javax.swing.JMenuItem();
+        jmiGestionarPedidos = new javax.swing.JMenuItem();
+        jmiProductos = new javax.swing.JMenuItem();
+        jmiProveedores = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        btnAbrirAreaVentas.setText("Area ventas");
-        btnAbrirAreaVentas.addActionListener(this::btnAbrirAreaVentasActionPerformed);
+        jMenu1.setText("Menu");
 
-        btnAbrirProductos.setText("Productos");
-        btnAbrirProductos.addActionListener(this::btnAbrirProductosActionPerformed);
+        jmnAreaVentas.setText("Area de Ventas");
 
-        btnAbrirProveedores.setText("Proveedores");
-        btnAbrirProveedores.addActionListener(this::btnAbrirProveedoresActionPerformed);
+        jmiGestionarClientes.setText("Gestionar Clientes");
+        jmiGestionarClientes.addActionListener(this::jmiGestionarClientesActionPerformed);
+        jmnAreaVentas.add(jmiGestionarClientes);
+
+        jmiGenerarPedido.setText("Generar Nuevo Pedido");
+        jmiGenerarPedido.addActionListener(this::jmiGenerarPedidoActionPerformed);
+        jmnAreaVentas.add(jmiGenerarPedido);
+
+        jmiGestionarPedidos.setText("Gestionar Pedidos");
+        jmiGestionarPedidos.addActionListener(this::jmiGestionarPedidosActionPerformed);
+        jmnAreaVentas.add(jmiGestionarPedidos);
+
+        jMenu1.add(jmnAreaVentas);
+
+        jmiProductos.setText("Productos");
+        jmiProductos.addActionListener(this::jmiProductosActionPerformed);
+        jMenu1.add(jmiProductos);
+
+        jmiProveedores.setText("Proveedores");
+        jmiProveedores.addActionListener(this::jmiProveedoresActionPerformed);
+        jMenu1.add(jmiProveedores);
+
+        jMenuBar1.add(jMenu1);
+
+        setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(139, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(btnAbrirProductos, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnAbrirAreaVentas, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnAbrirProveedores))
-                .addGap(14, 14, 14))
+            .addGap(0, 252, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap(40, Short.MAX_VALUE)
-                .addComponent(btnAbrirAreaVentas)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnAbrirProveedores)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnAbrirProductos)
-                .addGap(41, 41, 41))
+            .addGap(0, 157, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnAbrirAreaVentasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbrirAreaVentasActionPerformed
-        // TODO add your handling code here:
-        
-        FrmAreaVentas ventanaNueva = new FrmAreaVentas(this.gestorVentas, this.gestorContactos, this.gestorInventario);
+    private void jmiProveedoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmiProveedoresActionPerformed
+        FrmProveedores ventanaNueva = new FrmProveedores(this.gestorContactos);
+        ventanaNueva.setLocationRelativeTo(this);
         ventanaNueva.setVisible(true);
         this.setVisible(false);
-        
-    }//GEN-LAST:event_btnAbrirAreaVentasActionPerformed
+    }//GEN-LAST:event_jmiProveedoresActionPerformed
 
-    private void btnAbrirProductosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbrirProductosActionPerformed
-        // TODO add your handling code here:
-        FrmProductos ventanaNueva= new FrmProductos(this.gestorInventario,this.gestorContactos);
+    private void jmiProductosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmiProductosActionPerformed
+        FrmProductos ventanaNueva = new FrmProductos(this.gestorInventario, this.gestorContactos);
+        ventanaNueva.setLocationRelativeTo(this);
         ventanaNueva.setVisible(true);
-        this.setVisible(false);
-    }//GEN-LAST:event_btnAbrirProductosActionPerformed
+        this.setVisible(false);    
+    }//GEN-LAST:event_jmiProductosActionPerformed
 
-    private void btnAbrirProveedoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbrirProveedoresActionPerformed
-        // TODO add your handling code here:
-        FrmProveedores ventanaNueva= new FrmProveedores(this.gestorContactos);
-        ventanaNueva.setVisible(true);
+    private void jmiGenerarPedidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmiGenerarPedidoActionPerformed
+        FrmPedido ventanaPedido = new FrmPedido(this.gestorVentas, this.gestorContactos, this.gestorInventario);
+        ventanaPedido.setLocationRelativeTo(this);
+        ventanaPedido.setVisible(true);
         this.setVisible(false);
-    }//GEN-LAST:event_btnAbrirProveedoresActionPerformed
+    }//GEN-LAST:event_jmiGenerarPedidoActionPerformed
+
+    private void jmiGestionarPedidosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmiGestionarPedidosActionPerformed
+        FmrGestionPedidos ventanaGestion = new FmrGestionPedidos();
+        ventanaGestion.setLocationRelativeTo(this);
+        ventanaGestion.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_jmiGestionarPedidosActionPerformed
+
+    private void jmiGestionarClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmiGestionarClientesActionPerformed
+        FrmClientes ventanaClientes = new FrmClientes(this.gestorContactos);
+        ventanaClientes.setLocationRelativeTo(this);
+        ventanaClientes.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_jmiGestionarClientesActionPerformed
 
     /**
      * @param args the command line arguments
@@ -127,8 +152,13 @@ public class FrmMenu extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnAbrirAreaVentas;
-    private javax.swing.JButton btnAbrirProductos;
-    private javax.swing.JButton btnAbrirProveedores;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jmiGenerarPedido;
+    private javax.swing.JMenuItem jmiGestionarClientes;
+    private javax.swing.JMenuItem jmiGestionarPedidos;
+    private javax.swing.JMenuItem jmiProductos;
+    private javax.swing.JMenuItem jmiProveedores;
+    private javax.swing.JMenu jmnAreaVentas;
     // End of variables declaration//GEN-END:variables
 }

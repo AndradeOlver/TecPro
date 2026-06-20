@@ -31,6 +31,13 @@ public class OrdenCompra {
         setProveedor(proveedor);
         this.lotes = new ArrayList<>(); 
     }
+    public OrdenCompra(int codigo, String fechaIngreso, String estado, Proveedor proveedor) {
+        this.codigo = codigo;
+        this.fechaIngreso = fechaIngreso;
+        this.estado = estado;
+        this.proveedor = proveedor;
+        this.lotes = new ArrayList<>();
+    }
 
     public int getCodigo() {
         return codigo;

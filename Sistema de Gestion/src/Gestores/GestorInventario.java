@@ -1,234 +1,122 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package Gestores;
+    package Gestores;
 
+    import DAO.LoteProductoDAO;
+    import DAO.MovimientosKardexDAO;
+    import DAO.OrdenCompraDAO;
+    import DAO.ProductoDAO;
+    import Entidades.Producto;
+    import java.util.List;
 
-import Entidades.MovimientosKardex;
-import Entidades.OrdenCompra;
-import Entidades.Producto;
-import java.util.ArrayList;
-import java.util.List;
-/**
- *
- * @author equipo
- */
-public class GestorInventario {
-    // 1. Las "Bases de Datos" en memoria
-    private List<Producto> catalogoProductos;
-    private List<OrdenCompra> historialCompras;
-    private List<MovimientosKardex> bitacoraKardex;
+    public class GestorInventario {
+        private ProductoDAO productoDAO;
+        private OrdenCompraDAO ordenCompraDAO;
+        private LoteProductoDAO loteProductoDAO;
+        private MovimientosKardexDAO kardexDAO;
 
-    public GestorInventario() {
-        // Inicializamos las colecciones al nacer el gestor
-        this.catalogoProductos = new ArrayList<>();
-        this.historialCompras = new ArrayList<>();
-        this.bitacoraKardex = new ArrayList<>();
-       
-        cargarDatosDePrueba(); 
-    }
-
-    // ==========================================
-    // LÓGICA DE GESTIÓN DE PRODUCTOS
-    // ==========================================
-
-    public void registrarProducto(Producto nuevoProducto) {
-        if (nuevoProducto == null) {
-            throw new IllegalArgumentException("Error: No se puede registrar un producto nulo.");
+        public GestorInventario() {
+        this.productoDAO = new ProductoDAO();
+        this.ordenCompraDAO = new DAO.OrdenCompraDAO();
+        this.loteProductoDAO = new DAO.LoteProductoDAO();
+        this.kardexDAO = new DAO.MovimientosKardexDAO();
         }
 
-        // Validación de lógica de negocio: Evitar IDs duplicados
-        for (Producto p : catalogoProductos) {
-            if (p.getId() == nuevoProducto.getId()) {
+        
+
+        public void registrarProducto(Producto nuevoProducto) {
+            if (nuevoProducto == null) {
+                throw new IllegalArgumentException("Error: No se puede registrar un producto nulo.");
+            }
+
+            if (productoDAO.buscarPorId(nuevoProducto.getId()) != null) {
                 throw new IllegalArgumentException("Error: Ya existe un producto registrado con el ID " + nuevoProducto.getId());
             }
-        }
-        
-        this.catalogoProductos.add(nuevoProducto);
-    }
 
-    public Producto buscarProductoPorId(int idBuscado) {
-        // Búsqueda secuencial exacta
-        for (Producto p : catalogoProductos) {
-            if (p.getId() == idBuscado) {
-                return p;
-            }
-        }
-        return null;
-    }
-    
-    public List<Producto> buscarProductoPorDescripcion(String textoBusqueda) {
-        // Lógica para cumplir tu requerimiento visual: búsqueda ambigua
-        List<Producto> resultados = new ArrayList<>();
-        
-        for (Producto p : catalogoProductos) {
-            if (p.getDescripcion().toLowerCase().contains(textoBusqueda.toLowerCase())) {
-                resultados.add(p);
-            }
-        }
-        return resultados;
-    }
-
-    // ==========================================
-    // LÓGICA DE ÓRDENES DE COMPRA E INVENTARIO
-    // ==========================================
-
-    public void registrarOrdenCompra(OrdenCompra nuevaOrden) {
-        if (nuevaOrden == null) {
-            throw new IllegalArgumentException("Error: La orden de compra no puede ser nula.");
-        }
-
-        // Evitar duplicados por código de orden
-        for (OrdenCompra oc : historialCompras) {
-            if (oc.getCodigo() == nuevaOrden.getCodigo()) {
-                throw new IllegalArgumentException("Error: La orden con código " + nuevaOrden.getCodigo() + " ya existe.");
+            boolean exito = productoDAO.registrar(nuevoProducto);
+            if (!exito) {
+                throw new IllegalArgumentException("Error: Hubo un problema al guardar el producto en la Base de Datos.");
             }
         }
 
-        this.historialCompras.add(nuevaOrden);
+        public Producto buscarProductoPorId(int idBuscado) {
+            return productoDAO.buscarPorId(idBuscado);
+        }
+
+        public List<Producto> buscarProductoPorDescripcion(String textoBusqueda) {
+            return productoDAO.buscarPorDescripcion(textoBusqueda);
+        }
+
+        public List<Producto> obtenerTodosLosProductos() {
+            return productoDAO.obtenerTodos();
+        }
+
+        public void actualizarProducto(Producto productoModificado) {
+            if (productoModificado == null) {
+                throw new IllegalArgumentException("Error: El producto a actualizar es nulo.");
+            }
+
+            boolean exito = productoDAO.actualizar(productoModificado);
+            if (!exito) {
+                throw new IllegalArgumentException("Error: No se pudo actualizar el producto en la Base de Datos.");
+            }
+        }
+
+        // Método listo para cuando conectemos compras/ventas y necesitemos mover el inventario
+        public void modificarStock(int idProducto, int cantidadVariacion) {
+            Producto p = productoDAO.buscarPorId(idProducto);
+            if (p != null) {
+                int nuevoStock = p.getStock() + cantidadVariacion;
+                if (nuevoStock < 0) {
+                    throw new IllegalArgumentException("Error: El stock no puede quedar en negativo.");
+                }
+                p.setStock(nuevoStock);
+                productoDAO.actualizar(p);
+            } else {
+                throw new IllegalArgumentException("Error: Producto no encontrado para modificar stock.");
+            }
+        }
+        public java.util.List<Entidades.OrdenCompra> obtenerHistorialCompras() {
+        return ordenCompraDAO.obtenerTodos();
     }
 
-    public OrdenCompra buscarOrdenPorCodigo(int codigo) {
-        for (OrdenCompra oc : historialCompras) {
-             if (oc.getCodigo() == codigo) return oc;
-         }
-         return null;
-     }
+    public void registrarOrdenCompra(Entidades.OrdenCompra orden) {
+        boolean exito = ordenCompraDAO.registrar(orden);
+        if (exito) {
+            loteProductoDAO.registrarLotes(orden.getCodigo(), orden.getLotes());
+        } else {
+            throw new RuntimeException("Error crítico: Falló la creación de la orden en la BD.");
+        }
+    }
+
+    public void avanzarEstadoOrden(int codigo) {
+        Entidades.OrdenCompra orden = ordenCompraDAO.buscarPorCodigo(codigo);
+        if(orden != null) {
+            orden.avanzarEstado(); // Ejecuta tu regla de negocio (Solicitada -> Pendiente -> Procesada)
+            ordenCompraDAO.actualizarEstado(codigo, orden.getEstado());
+        }
+    }
+
+    public void cancelarOrden(int codigo) {
+        ordenCompraDAO.actualizarEstado(codigo, "Cancelada");
+    }
 
     public void procesarStockKardex(int codigoOrden) {
-        OrdenCompra orden = buscarOrdenPorCodigo(codigoOrden);
-        if (orden != null && orden.getEstado().equals("Procesada")) {
-            // Esto ejecuta la matemática y crea el historial del Kardex
-            List<Entidades.MovimientosKardex> nuevosMovimientos = orden.procesarEntradaAlmacen();
-            if (nuevosMovimientos != null && !nuevosMovimientos.isEmpty()) {
-                this.bitacoraKardex.addAll(nuevosMovimientos);
-            }
-        }
-    }
-
-    public void avanzarEstadoOrden(int codigoOrden) {
-        OrdenCompra orden = buscarOrdenPorCodigo(codigoOrden);
-        if (orden == null) throw new IllegalArgumentException("Orden no encontrada.");
+        // 1. Buscamos la orden y sus productos (lotes) de la BD
+        Entidades.OrdenCompra orden = ordenCompraDAO.buscarPorCodigo(codigoOrden);
+        if (orden == null) return;
         
-        orden.avanzarEstado(); 
-        
-        // Si al avanzar llegó a Procesada, automáticamente sube el stock
-        if (orden.getEstado().equals("Procesada")) {
-            procesarStockKardex(codigoOrden);
+        orden.getLotes().addAll(loteProductoDAO.obtenerLotesPorOrden(codigoOrden));
+
+        // 2. Ejecutamos tu propio método matemático de Entidades.OrdenCompra
+        java.util.List<Entidades.MovimientosKardex> movimientosGenerados = orden.procesarEntradaAlmacen();
+
+        // 3. Guardamos los resultados del Kardex y actualizamos los precios/stock de los Productos
+        for (Entidades.MovimientosKardex mk : movimientosGenerados) {
+            kardexDAO.registrar(mk);
+            productoDAO.actualizar(mk.getProducto());
         }
     }
 
-    public void cancelarOrden(int codigoOrden) {
-        OrdenCompra orden = buscarOrdenPorCodigo(codigoOrden);
-        if (orden != null) {
-            orden.cancelarOrden();
-        }
+    public java.util.List<Entidades.MovimientosKardex> obtenerKardexPorProducto(int idProducto) {
+        return kardexDAO.obtenerPorProducto(idProducto);
     }
-
-    // ==========================================
-    // LÓGICA DE LECTURA DEL KARDEX
-    // ==========================================
-
-    public List<MovimientosKardex> obtenerKardexPorProducto(int idProducto) {
-        // Filtra la bitácora global para devolver solo la historia de un producto específico
-        List<MovimientosKardex> historialProducto = new ArrayList<>();
-        
-        for (MovimientosKardex mov : bitacoraKardex) {
-            if (mov.getProducto().getId() == idProducto) {
-                historialProducto.add(mov);
-            }
-        }
-        
-        return historialProducto;
     }
-
-    // ==========================================
-    // MÉTODO DE SIMULACIÓN (DATOS DE PRUEBA)
-    // ==========================================
-
-    private void cargarDatosDePrueba() {
-        try {
-            // 1. Instanciamos el producto (como ya lo tenías)
-            // Ojo: Lo dejamos con stock final de 8, porque simularemos que entraron 10 y se vendieron 2.
-            Producto p1 = new Producto("Laptop Dell Inspiron", 2500.00, 2000.00, 8); 
-            registrarProducto(p1);
-
-            // ========================================================
-            // 2. SIMULACIÓN DE KARDEX PARA LA LAPTOP (p1)
-            // ========================================================
-        
-            // Movimiento A: El inventario inicial (Entraron 10 laptops el 1 de junio)
-            Entidades.MovimientosKardex mov1 = new Entidades.MovimientosKardex(
-                "2026-06-01",     // Fecha
-                "entrada",        // Tipo
-                10,               // Cantidad que ingresa
-                2000.00,          // Costo unitario de compra
-                10,               // Saldo de cantidad en ese momento
-                2000.00,          // Saldo de costo promedio en ese momento
-                p1                // El producto al que pertenece
-            );
-            this.bitacoraKardex.add(mov1); // Lo guardamos en el archivero
-
-            // Movimiento B: Una venta (Salieron 2 laptops al día siguiente)
-            Entidades.MovimientosKardex mov2 = new Entidades.MovimientosKardex(
-                "2026-06-02",     // Fecha
-                "salida",         // Tipo
-                2,                // Cantidad que sale
-                2000.00,          // Salen costeados al promedio que teníamos (2000)
-                8,                // Saldo de cantidad restante (10 - 2 = 8)
-                2000.00,          // El costo promedio no cambia en las salidas
-                p1                // El producto al que pertenece
-            );  
-            this.bitacoraKardex.add(mov2); // Lo guardamos en el archivero
-
-
-            // 3. Tus otros productos de prueba para que la tabla principal no se vea vacía
-            Producto p2 = new Producto("Mouse Inalámbrico Logitech", 80.00, 50.00, 50);
-            Producto p3 = new Producto("Monitor LG 24 Pulgadas", 600.00, 450.00, 15);
-            registrarProducto(p2);
-            registrarProducto(p3);
-        
-        } catch (Exception e) {
-        System.out.println("Error cargando semillas de inventario: " + e.getMessage());
-        }
-    }
-    
-    // Métodos de acceso general para pintar las tablas en los Forms  
-    public List<Producto> obtenerCatalogoCompleto() {
-        return new ArrayList<>(this.catalogoProductos);
-    }
-   
-    
-    public List<OrdenCompra> obtenerHistorialCompras() {
-        return new ArrayList<>(this.historialCompras);
-    }
-    public void actualizarProducto(Producto productoModificado) {
-        if (productoModificado == null) {
-            throw new IllegalArgumentException("Error: El producto a actualizar no puede ser nulo.");
-        }
-
-        boolean encontrado = false;
-        
-        // Usamos un bucle clásico para tener acceso al índice (i)
-        for (int i = 0; i < catalogoProductos.size(); i++) {
-            // Buscamos cuál de los productos viejos tiene el mismo ID que el nuevo
-            if (catalogoProductos.get(i).getId() == productoModificado.getId()) {
-                
-                // Reemplazamos el objeto viejo por el nuevo en esa posición exacta
-                catalogoProductos.set(i, productoModificado);
-                encontrado = true;
-                
-                break; // Rompemos el ciclo porque ya lo actualizamos
-            }
-        }
-
-        // Si terminó de revisar toda la lista y no lo encontró, lanzamos una alerta
-        if (!encontrado) {
-            throw new IllegalArgumentException("Error: No se encontró el producto con ID " + productoModificado.getId() + " en el sistema.");
-        }
-    }
-    
-    
-    
-}

@@ -7,129 +7,79 @@ import Entidades.PagoAbono;
 import Entidades.Pedido;
 import java.util.ArrayList;
 import java.util.List;
+import DAO.PedidoDAO;
+import DAO.DetallePedidoDAO;
+import Entidades.Pedido;
+import Entidades.DetallePedido;
 /**
  *
  * @author equipo
  */
 public class GestorVentas {
-    // 1. La "Base de Datos" en memoria para el historial comercial
-    private List<Pedido> historialPedidos;
+    
+    private PedidoDAO pedidoDAO;
+    private DetallePedidoDAO detallePedidoDAO;
+    private GestorInventario gestorInventario; // Necesario para actualizar el stock
 
     public GestorVentas() {
-        this.historialPedidos = new ArrayList<>();
-        cargarDatosDePrueba();
+        this.pedidoDAO = new PedidoDAO();
+        this.detallePedidoDAO = new DetallePedidoDAO();
+        this.gestorInventario = new GestorInventario(); // Conectamos con el módulo de inventario
     }
 
-    // ==========================================
-    // LÓGICA DE GESTIÓN DE PEDIDOS
-    // ==========================================
-
-    public void registrarPedido(Pedido nuevoPedido) {
+    public void registrarVenta(Pedido nuevoPedido) {
         if (nuevoPedido == null) {
-            throw new IllegalArgumentException("Error: No se puede registrar un pedido nulo.");
-        }
-
-        // Lógica de seguridad: Evitar duplicidad de facturas/pedidos
-        for (Pedido p : historialPedidos) {
-            if (p.getCodigo() == nuevoPedido.getCodigo()) {
-                throw new IllegalArgumentException("Error: Ya existe un pedido registrado con el código " + nuevoPedido.getCodigo());
-            }
+            throw new IllegalArgumentException("Error: El pedido no puede ser nulo.");
         }
         
-        // El pedido ya debe venir con sus detalles (productos) cargados desde la interfaz
-        this.historialPedidos.add(nuevoPedido);
-    }
+        if (nuevoPedido.getDetalles() == null || nuevoPedido.getDetalles().isEmpty()) {
+            throw new IllegalArgumentException("Error: No se puede registrar un pedido sin productos.");
+        }
 
-    public Pedido buscarPedidoPorCodigo(int codigoBuscado) {
-        for (Pedido p : historialPedidos) {
-            if (p.getCodigo() == codigoBuscado) {
-                return p;
+        // 1. Guardamos la cabecera del Pedido en SQL Server
+        boolean pedidoGuardado = pedidoDAO.registrar(nuevoPedido);
+        
+        if (!pedidoGuardado) {
+            throw new RuntimeException("Error crítico: Falló la creación del pedido en la base de datos.");
+        }
+
+        // 2. Guardamos todos los productos de ese pedido (Detalles) en SQL Server
+        boolean detallesGuardados = detallePedidoDAO.registrarDetalles(nuevoPedido.getCodigo(), nuevoPedido.getDetalles());
+        
+        if (!detallesGuardados) {
+            throw new RuntimeException("Error crítico: Falló la creación de los detalles del pedido.");
+        }
+
+        // 3. Descontamos el stock físico del inventario (Regla de negocio)
+        // Solo descontamos si el estado implica que la mercadería salió
+        if (!nuevoPedido.getEstado().equalsIgnoreCase("Anulado")) {
+            for (DetallePedido dp : nuevoPedido.getDetalles()) {
+                // Pasamos el ID del producto y la cantidad en NEGATIVO para restar
+                gestorInventario.modificarStock(dp.getProducto().getId(), -dp.getCantidadVendida());
             }
         }
-        return null;
     }
 
-    public List<Pedido> obtenerPedidosPorCliente(int codigoCliente) {
-        // Retorna todo el historial de un cliente específico
-        List<Pedido> resultados = new ArrayList<>();
+    public void registrarPagoAbono(int codigoPedido, double montoAbonado, double deudaActual) {
+        if (montoAbonado <= 0) {
+            throw new IllegalArgumentException("Error: El monto a abonar debe ser mayor a cero.");
+        }
+
+        double nuevaDeuda = deudaActual - montoAbonado;
+        if (nuevaDeuda < 0) {
+            throw new IllegalArgumentException("Error: El abono supera la deuda actual.");
+        }
+
+        // Determinamos el nuevo estado basado en si la deuda llegó a 0
+        String nuevoEstado = (nuevaDeuda == 0) ? "Entregado" : "Pendiente";
+
+        // Actualizamos la base de datos
+        boolean actualizado = pedidoDAO.actualizarEstadoYDeuda(codigoPedido, nuevoEstado, nuevaDeuda);
         
-        for (Pedido p : historialPedidos) {
-            if (p.getCliente().getCodigo() == codigoCliente) {
-                resultados.add(p);
-            }
+        if (!actualizado) {
+            throw new RuntimeException("Error: No se pudo registrar el abono en la base de datos.");
         }
-        return resultados;
-    }
-
-    // ==========================================
-    // LÓGICA DE FILTRADO (REGLA DE NEGOCIO: MESES)
-    // ==========================================
-
-    public List<Pedido> filtrarPedidosPorMes(String mesAnioBuscado) {
-        // Lógica para cumplir la regla: "Todas las tablas deben dividirse en meses"
-        // El formato esperado de 'mesAnioBuscado' debería ser "YYYY-MM" (Ej. "2026-05")
-        List<Pedido> resultados = new ArrayList<>();
         
-        for (Pedido p : historialPedidos) {
-            // Extraemos los primeros 7 caracteres de la fecha de emisión (AAAA-MM)
-            if (p.getFechaEmision() != null && p.getFechaEmision().startsWith(mesAnioBuscado)) {
-                resultados.add(p);
-            }
-        }
-        return resultados;
+        // (Nota: Aquí en el futuro puedes agregar la llamada a PagoAbonoDAO para guardar el recibo físico)
     }
-
-    // ==========================================
-    // LÓGICA FINANCIERA (RECAUDACIÓN)
-    // ==========================================
-
-    public void registrarPagoMonto(PagoAbono nuevoAbono) {
-        if (nuevoAbono == null) {
-            throw new IllegalArgumentException("Error: El abono no puede ser nulo.");
-        }
-
-        // 1. Verificamos que el pedido asociado al abono realmente exista en el sistema
-        Pedido pedidoAsociado = buscarPedidoPorCodigo(nuevoAbono.getPedido().getCodigo());
-        
-        if (pedidoAsociado == null) {
-            throw new IllegalArgumentException("Error: El pedido al que intenta abonar no existe.");
-        }
-
-        // 2. Ejecutamos la lógica de cobro. El método procesarPago() del abono 
-        // internamente mandará a descontar la deuda en la clase Pedido.
-        nuevoAbono.procesarPago();
-    }
-
-    public double calcularDeudaGlobal() {
-        // Lógica de auditoría: Suma absolutamente todo el dinero que está en la calle (cuánto nos deben)
-        double deudaTotalEmpresa = 0.0;
-        
-        for (Pedido p : historialPedidos) {
-            if (p.getEstado().equals("Activo") || p.getEstado().equals("Pendiente")) {
-                deudaTotalEmpresa += p.getDeudaPendiente();
-            }
-        }
-        return deudaTotalEmpresa;
-    }
-
-    // ==========================================
-    // MÉTODO DE SIMULACIÓN (DATOS DE PRUEBA)
-    // ==========================================
-
-    private void cargarDatosDePrueba() {
-        try {
-            // Para probar esta sección en tus ventanas visuales, necesitarás que 
-            // este gestor trabaje en equipo con el GestorContactos en el Main.
-            // Por ahora dejamos la estructura lista para recibir los pedidos.
-            
-        } catch (Exception e) {
-            System.out.println("Error cargando semillas de ventas: " + e.getMessage());
-        }
-    }
-    
-    // Método para llenar la tabla principal de Ventas en el Formulario
-    public List<Pedido> obtenerHistorialCompleto() {
-        return this.historialPedidos;
-    }
-    
 }

@@ -500,17 +500,16 @@ public class FrmClientes extends javax.swing.JFrame {
     }//GEN-LAST:event_itemEditarActionPerformed
 
     private void btnRegresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegresarActionPerformed
-        // TODO add your handling code here:
-       // Buscamos el Área de Ventas original (que tiene los gestores vivos) y lo encendemos
-        for (java.awt.Window window : java.awt.Window.getWindows()) {
-            if (window instanceof FrmAreaVentas) {
-                window.setVisible(true);
-                break;
-            }
+        // Buscamos el Menú principal en la memoria de Java y lo volvemos a encender
+    for (java.awt.Window window : java.awt.Window.getWindows()) {
+        if (window instanceof Vista.FrmMenu) {
+            window.setVisible(true);
+            break;
         }
-        
-        // Cerramos la ventana actual (la del pedido)
-        this.dispose();
+    }
+    
+    // Cerramos y destruimos la ventana actual en la que estamos
+    this.dispose();
     }//GEN-LAST:event_btnRegresarActionPerformed
       // 4. Lógica de Lectura Visual (El puente entre la lista y la pantalla)
     private void actualizarTabla() {
