@@ -11,7 +11,7 @@
         private ProductoDAO productoDAO;
         private OrdenCompraDAO ordenCompraDAO;
         private LoteProductoDAO loteProductoDAO;
-        private MovimientosKardexDAO kardexDAO;
+        private MovimientosKardexDAO kardexDAO; 
 
         public GestorInventario() {
         this.productoDAO = new ProductoDAO();
