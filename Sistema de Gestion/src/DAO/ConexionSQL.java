@@ -28,15 +28,15 @@ public class ConexionSQL {
     public static Connection probarConexion() {
         Connection conexion = null;
         
-        // 2. La Zona de Riesgo (try-catch)
+        
         try {
-            // 3. El Traductor (Instanciamos el Driver)
+            
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             
-            // 4. La Ejecución del Enlace
+            
             conexion = DriverManager.getConnection(URL, USUARIO, CLAVE);
             
-            // 5. La Verificación
+           
             if (conexion != null) {
                 System.out.println("¡Conexión establecida con éxito a SQL Server!");
             }

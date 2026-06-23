@@ -4,6 +4,7 @@
     import DAO.MovimientosKardexDAO;
     import DAO.OrdenCompraDAO;
     import DAO.ProductoDAO;
+import Entidades.OrdenCompra;
     import Entidades.Producto;
     import java.util.List;
 
@@ -101,13 +102,13 @@
 
     public void procesarStockKardex(int codigoOrden) {
         // 1. Buscamos la orden y sus productos (lotes) de la BD
-        Entidades.OrdenCompra orden = ordenCompraDAO.buscarPorCodigo(codigoOrden);
+        OrdenCompra orden = ordenCompraDAO.buscarPorCodigo(codigoOrden);
         if (orden == null) return;
         
         orden.getLotes().addAll(loteProductoDAO.obtenerLotesPorOrden(codigoOrden));
 
         // 2. Ejecutamos tu propio método matemático de Entidades.OrdenCompra
-        java.util.List<Entidades.MovimientosKardex> movimientosGenerados = orden.procesarEntradaAlmacen();
+        List<Entidades.MovimientosKardex> movimientosGenerados = orden.procesarEntradaAlmacen();
 
         // 3. Guardamos los resultados del Kardex y actualizamos los precios/stock de los Productos
         for (Entidades.MovimientosKardex mk : movimientosGenerados) {
@@ -119,4 +120,10 @@
     public java.util.List<Entidades.MovimientosKardex> obtenerKardexPorProducto(int idProducto) {
         return kardexDAO.obtenerPorProducto(idProducto);
     }
+    public void eliminarOrdenesCanceladas() {
+        boolean exito = ordenCompraDAO.eliminarCanceladas();
+        if (!exito) {
+            throw new RuntimeException("Error crítico: No se pudieron eliminar las órdenes de la base de datos.");
+        }
     }
+}
