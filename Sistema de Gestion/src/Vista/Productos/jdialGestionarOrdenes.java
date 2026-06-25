@@ -4,6 +4,7 @@
  */
 package Vista.Productos;
 
+import Entidades.OrdenCompra;
 import Gestores.GestorInventario;
 
 /**
@@ -92,6 +93,9 @@ public class jdialGestionarOrdenes extends javax.swing.JDialog {
             }
         });
         tblOrdenes.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblOrdenesMouseClicked(evt);
+            }
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 tblOrdenesMouseReleased(evt);
             }
@@ -231,6 +235,31 @@ public class jdialGestionarOrdenes extends javax.swing.JDialog {
             }
         }
     }//GEN-LAST:event_btnEliminarCanceladosActionPerformed
+
+    private void tblOrdenesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblOrdenesMouseClicked
+       if (evt.getClickCount() == 2) {
+            int fila = tblOrdenes.getSelectedRow();
+            
+            if (fila != -1) {
+                int codigoOrden = Integer.parseInt(tblOrdenes.getValueAt(fila, 1).toString());
+                
+                // Pedimos al gestor la orden con todos sus productos
+                Entidades.OrdenCompra ordenCompleta = gestor.obtenerDetallesDeOrden(codigoOrden);
+                
+                if (ordenCompleta != null) {
+                    // Instanciamos el JDialog (el 'this' asume que estamos dentro de un JFrame o JDialog padre)
+                    jdialVerDetalle ventanaDetalles = new jdialVerDetalle(new javax.swing.JFrame(), true);
+                    
+                    // Le enviamos la orden para que se pinte a sí misma
+                    ventanaDetalles.cargarDetalles(ordenCompleta);
+                    
+                    // La centramos y la mostramos
+                    ventanaDetalles.setLocationRelativeTo(this);
+                    ventanaDetalles.setVisible(true);
+                }
+            }
+        }
+    }//GEN-LAST:event_tblOrdenesMouseClicked
 
     /**
      * @param args the command line arguments

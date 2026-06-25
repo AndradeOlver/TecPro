@@ -1,11 +1,14 @@
 package DAO;
 
 import Entidades.DetallePedido;
+import Entidades.Producto;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.sql.ResultSet;
 
 public class DetallePedidoDAO {
 
@@ -36,5 +39,37 @@ public class DetallePedidoDAO {
             System.err.println("Error al registrar los detalles del pedido: " + e.getMessage());
             return false;
         }
+    }
+    // Recupera todos los productos asociados a una venta
+    public List<DetallePedido> obtenerDetallesPorPedido(int codigoPedido) {
+        List<DetallePedido> lista = new ArrayList<>();
+        String sql = "SELECT * FROM DetallePedido WHERE Pedido_Codigo = ?";
+        
+        try (Connection con = ConexionSQL.probarConexion(); 
+             PreparedStatement ps = con.prepareStatement(sql)) {
+             
+            ps.setInt(1, codigoPedido);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                // Reutilizamos el ProductoDAO para ensamblar el producto que se vendió
+                ProductoDAO pDAO = new ProductoDAO();
+                
+                while (rs.next()) {
+                    Producto p = pDAO.buscarPorId(rs.getInt("Producto_ID"));
+                    
+                    if(p != null) {
+                        DetallePedido dp = new DetallePedido(
+                            rs.getInt("CantidadVendida"), 
+                            rs.getDouble("PrecioVentaCongelado"), 
+                            p
+                        );
+                        lista.add(dp);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener los detalles del pedido: " + e.getMessage());
+        }
+        return lista;
     }
 }

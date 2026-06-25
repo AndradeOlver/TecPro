@@ -4,6 +4,10 @@
  */
 package Vista;
 
+import Entidades.DetallePedido;
+import Entidades.Pedido;
+import Gestores.GestorVentas;
+
 /**
  *
  * @author equipo
@@ -11,12 +15,48 @@ package Vista;
 public class FmrGestionPedidos extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FmrGestionPedidos.class.getName());
-
+    private GestorVentas gestorVentas;
+    
     /**
      * Creates new form FmrGestionPedidos
      */
-    public FmrGestionPedidos() {
+    public FmrGestionPedidos(GestorVentas gestor) {
         initComponents();
+        this.gestorVentas = gestor;
+        
+        // Apagamos los botones de acción hasta que seleccionen una fila
+        btnProcesar.setEnabled(false);
+        btnCancelar.setEnabled(false);
+        btnCancelar.setEnabled(false); // Nuevo botón para ventas
+        
+        actualizarTabla();
+    }
+    private void actualizarTabla() {
+        javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) tblPedidos.getModel();
+        modelo.setRowCount(0); 
+
+        // Traemos el historial de ventas
+        java.util.List<Pedido> lista = gestorVentas.obtenerHistorialPedidos();
+        
+        for (Pedido p : lista) {
+            double montoTotal = 0;
+            // En ventas se usan Detalles de Pedido, no Lotes
+            for (DetallePedido detalle : p.getDetalles()) {
+                montoTotal += detalle.getCantidadVendida() * detalle.getPrecioVentaCongelado();
+            }
+            
+            // Ordenamos: Fecha, Codigo, Cliente, Monto Total, Estado
+           modelo.addRow(new Object[]{
+                p.getCodigo(), 
+                p.getCliente().getNombre(), 
+                p.getFechaEmision(),
+                p.getFechaRecepcion(),
+                String.format("S/ %.2f", montoTotal),
+                p.getEstado(),
+                p.getTipoVenta(),
+                String.format("S/ %.2f", p.getDeudaPendiente()) // Usamos la deuda en lugar de FechaPago
+            });
+        }
     }
 
     /**
@@ -29,12 +69,16 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tblPedidos = new javax.swing.JTable();
         btnRegresar = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        btnProcesar = new javax.swing.JButton();
+        btnCancelar = new javax.swing.JButton();
+        btnRegistrarPago = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tblPedidos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null, null},
@@ -42,7 +86,7 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
                 {null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4", "null", "null", "null", "null"
+                "Codigo", "Cliente", "Emision", "Recepcion", "Total", "Estado", "Tipo Venta", "FechaPago"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -53,20 +97,42 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(jTable1);
-        if (jTable1.getColumnModel().getColumnCount() > 0) {
-            jTable1.getColumnModel().getColumn(0).setResizable(false);
-            jTable1.getColumnModel().getColumn(1).setResizable(false);
-            jTable1.getColumnModel().getColumn(2).setResizable(false);
-            jTable1.getColumnModel().getColumn(3).setResizable(false);
-            jTable1.getColumnModel().getColumn(4).setResizable(false);
-            jTable1.getColumnModel().getColumn(5).setResizable(false);
-            jTable1.getColumnModel().getColumn(6).setResizable(false);
-            jTable1.getColumnModel().getColumn(7).setResizable(false);
+        tblPedidos.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        tblPedidos.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblPedidosMouseClicked(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                tblPedidosMouseReleased(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tblPedidos);
+        if (tblPedidos.getColumnModel().getColumnCount() > 0) {
+            tblPedidos.getColumnModel().getColumn(0).setResizable(false);
+            tblPedidos.getColumnModel().getColumn(1).setResizable(false);
+            tblPedidos.getColumnModel().getColumn(2).setResizable(false);
+            tblPedidos.getColumnModel().getColumn(3).setResizable(false);
+            tblPedidos.getColumnModel().getColumn(4).setResizable(false);
+            tblPedidos.getColumnModel().getColumn(5).setResizable(false);
+            tblPedidos.getColumnModel().getColumn(6).setResizable(false);
+            tblPedidos.getColumnModel().getColumn(7).setResizable(false);
         }
 
         btnRegresar.setText("Regresar");
         btnRegresar.addActionListener(this::btnRegresarActionPerformed);
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        jLabel1.setText("Pedidos");
+        jLabel1.setToolTipText("");
+
+        btnProcesar.setText("Procesar");
+        btnProcesar.addActionListener(this::btnProcesarActionPerformed);
+
+        btnCancelar.setText("Cancelar");
+        btnCancelar.addActionListener(this::btnCancelarActionPerformed);
+
+        btnRegistrarPago.setText("Registrar Pago");
+        btnRegistrarPago.addActionListener(this::btnRegistrarPagoActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -74,19 +140,36 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(59, 59, 59)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnRegresar)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 479, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnProcesar)
+                        .addGap(110, 110, 110)
+                        .addComponent(btnCancelar)
+                        .addGap(100, 100, 100)
+                        .addComponent(btnRegistrarPago))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(btnRegresar)
+                            .addGap(110, 110, 110)
+                            .addComponent(jLabel1))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 479, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(71, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(25, Short.MAX_VALUE)
-                .addComponent(btnRegresar)
+                .addContainerGap(19, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnRegresar))
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 308, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(14, 14, 14))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 253, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(30, 30, 30)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnProcesar)
+                    .addComponent(btnCancelar)
+                    .addComponent(btnRegistrarPago))
+                .addGap(55, 55, 55))
         );
 
         pack();
@@ -105,34 +188,172 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
     this.dispose();
     }//GEN-LAST:event_btnRegresarActionPerformed
 
+    private void tblPedidosMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblPedidosMouseReleased
+        // TODO add your handling code here:
+        int fila = tblPedidos.getSelectedRow();
+        if (fila != -1) {
+            btnProcesar.setEnabled(true);
+            btnCancelar.setEnabled(true);
+            
+            // Si el pedido tiene deuda o es a crédito, habilitamos el cobro
+            String estado = tblPedidos.getValueAt(fila, 4).toString();
+            if (estado.equalsIgnoreCase("Pendiente") || estado.equalsIgnoreCase("Abonada")) {
+                btnRegistrarPago.setEnabled(true);
+            } else {
+                btnRegistrarPago.setEnabled(false);
+            }
+        }
+    }//GEN-LAST:event_tblPedidosMouseReleased
+
+    private void tblPedidosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblPedidosMouseClicked
+        // TODO add your handling code here:
+        if (evt.getClickCount() == 2) {
+            int fila = tblPedidos.getSelectedRow();
+            if (fila != -1) {
+                int codigo = Integer.parseInt(tblPedidos.getValueAt(fila, 0).toString());
+                
+                Pedido pedidoCompleto = gestorVentas.obtenerDetallesDePedido(codigoPedido);
+                
+                if (pedidoCompleto != null) {
+                    // Necesitarás crear un jdialVerDetalleVenta similar al de compras
+                    jdialDetalleVenta ventanaDetalles = new jdialDetalleVenta(this, true);
+                    ventanaDetalles.cargarDetalles(pedidoCompleto);
+                    ventanaDetalles.setLocationRelativeTo(this);
+                    ventanaDetalles.setVisible(true);
+                }
+            }
+        }
+    }//GEN-LAST:event_tblPedidosMouseClicked
+
+    private void btnProcesarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProcesarActionPerformed
+        // TODO add your handling code here:
+        int fila = tblPedidos.getSelectedRow();
+        if (fila != -1) {
+            try {
+                int codigo = Integer.parseInt(tblPedidos.getValueAt(fila, 0).toString());
+                gestorVentas.avanzarEstadoPedido(codigo);
+                javax.swing.JOptionPane.showMessageDialog(this, "Pedido avanzado/procesado con éxito.");
+                actualizarTabla(); // En JFrame, en vez de cerrar (dispose), actualizamos la tabla
+            } catch (Exception ex) {
+                javax.swing.JOptionPane.showMessageDialog(this, ex.getMessage(), "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_btnProcesarActionPerformed
+
+    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
+        // TODO add your handling code here:
+        int fila = tblPedidos.getSelectedRow();
+        if (fila != -1) {
+            try {
+                int codigo = Integer.parseInt(tblPedidos.getValueAt(fila, 0).toString());
+                gestorVentas.cancelarPedido(codigo);
+                javax.swing.JOptionPane.showMessageDialog(this, "El pedido ha sido cancelado.");
+                actualizarTabla();
+            } catch (Exception ex) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error Crítico", javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_btnCancelarActionPerformed
+
+    private void btnRegistrarPagoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarPagoActionPerformed
+        // TODO add your handling code here:
+        int fila = tblPedidos.getSelectedRow();
+        if (fila != -1) {
+            // 1. Extraemos el código de la primera columna
+            int codigo = Integer.parseInt(tblPedidos.getValueAt(fila, 0).toString());
+            
+            // 2. Traemos el pedido fresco desde la base de datos para ver la deuda real
+            Pedido pedido = gestorVentas.obtenerDetallesDePedido(codigo);
+            
+            if (pedido != null && pedido.getDeudaPendiente() > 0) {
+                // 3. Solicitamos el ingreso del abono
+                String input = javax.swing.JOptionPane.showInputDialog(this, 
+                    "Deuda pendiente: S/ " + pedido.getDeudaPendiente() + "\n\nIngrese el monto a abonar:");
+                
+                // 4. Verificamos que no haya cancelado la ventana o enviado vacío
+                if (input != null && !input.trim().isEmpty()) {
+                    try {
+                        // Cambiamos comas por puntos por si el usuario se equivoca al tipear
+                        double abono = Double.parseDouble(input.replace(",", "."));
+                        
+                        // 5. Enviamos la orden al gestor
+                        gestorVentas.registrarPagoAbono(codigo, abono);
+                        javax.swing.JOptionPane.showMessageDialog(this, "Abono registrado con éxito.");
+                        
+                        // 6. Refrescamos la tabla para que la interfaz muestre el nuevo saldo
+                        actualizarTabla();
+                        
+                    } catch (NumberFormatException e) {
+                        javax.swing.JOptionPane.showMessageDialog(this, "Por favor, ingrese un monto numérico válido.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                    } catch (Exception ex) {
+                        javax.swing.JOptionPane.showMessageDialog(this, ex.getMessage(), "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+                    }
+                }
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this, "Este pedido no tiene deuda pendiente.", "Aviso", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_btnRegistrarPagoActionPerformed
+
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+   private void ajustarAnchoColumnas() {
+       tblPedidos.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+    // 1. Extraemos el modelo estructural de las columnas de tu tabla y su cabecera
+    javax.swing.table.TableColumnModel modeloColumna = tblPedidos.getColumnModel();
+    javax.swing.table.JTableHeader cabecera = tblPedidos.getTableHeader();
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new FmrGestionPedidos().setVisible(true));
+    // 2. Recorremos cada una de las columnas
+    for (int i = 0; i < modeloColumna.getColumnCount(); i++) {
+        int anchoCalculado = 50; // Un ancho mínimo por seguridad
+        javax.swing.table.TableColumn columna = modeloColumna.getColumn(i);
+
+        // --- A. REVISAMOS CUÁNTO ESPACIO EXIGE EL TÍTULO (CABECERA) ---
+        if (cabecera != null) {
+            // Método 1: Por Renderer (el que ya tenías)
+            javax.swing.table.TableCellRenderer rendererCabecera = columna.getHeaderRenderer();
+            if (rendererCabecera == null) {
+                rendererCabecera = cabecera.getDefaultRenderer();
+            }
+            java.awt.Component compCabecera = rendererCabecera.getTableCellRendererComponent(
+                tblPedidos, columna.getHeaderValue(), false, false, 0, i);
+            
+            int anchoPorRenderer = compCabecera.getPreferredSize().width;
+
+            // Método 2: Por FontMetrics (Refuerzo infalible para el texto del título)
+            java.awt.FontMetrics fm = cabecera.getFontMetrics(cabecera.getFont());
+            String textoTitulo = columna.getHeaderValue() != null ? columna.getHeaderValue().toString() : "";
+            // Sumamos 20px extra para asegurar espacio para márgenes o íconos de ordenamiento
+            int anchoPorTexto = fm.stringWidth(textoTitulo) + 20; 
+
+            // Nos quedamos con el valor más grande entre el renderer y nuestro cálculo manual
+            anchoCalculado = Math.max(anchoCalculado, Math.max(anchoPorRenderer, anchoPorTexto));
+        }
+
+        // --- B. RECORREMOS LAS FILAS PARA BUSCAR EL CONTENIDO MÁS LARGO ---
+        for (int j = 0; j < tblPedidos.getRowCount(); j++) {
+            javax.swing.table.TableCellRenderer rendererCelda = tblPedidos.getCellRenderer(j, i);
+            java.awt.Component compCelda = rendererCelda.getTableCellRendererComponent(
+                tblPedidos, tblPedidos.getValueAt(j, i), false, false, j, i);
+            
+            anchoCalculado = Math.max(anchoCalculado, compCelda.getPreferredSize().width);
+        }
+
+        // --- C. APLICAMOS EL TAMAÑO GANADOR ---
+        // Le damos 15 píxeles de margen estético general en lugar de 10 para que "respire" mejor
+        columna.setPreferredWidth(anchoCalculado + 15);
     }
+}
+ 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCancelar;
+    private javax.swing.JButton btnProcesar;
+    private javax.swing.JButton btnRegistrarPago;
     private javax.swing.JButton btnRegresar;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tblPedidos;
     // End of variables declaration//GEN-END:variables
 }

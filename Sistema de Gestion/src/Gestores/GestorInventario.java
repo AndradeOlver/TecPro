@@ -99,6 +99,17 @@ import Entidades.OrdenCompra;
     public void cancelarOrden(int codigo) {
         ordenCompraDAO.actualizarEstado(codigo, "Cancelada");
     }
+    public OrdenCompra obtenerDetallesDeOrden(int codigoOrden) {
+        // 1. Buscamos la cabecera de la orden
+        OrdenCompra orden = ordenCompraDAO.buscarPorCodigo(codigoOrden);
+        
+        if (orden != null) {
+            // 2. Le inyectamos la lista de productos asociados a ese código
+            orden.getLotes().addAll(loteProductoDAO.obtenerLotesPorOrden(codigoOrden));
+        }
+        
+        return orden;
+    }
 
     public void procesarStockKardex(int codigoOrden) {
         // 1. Buscamos la orden y sus productos (lotes) de la BD

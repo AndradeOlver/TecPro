@@ -1,4 +1,5 @@
 /*
+/*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
@@ -128,9 +129,9 @@ public class FrmAreaVentas extends javax.swing.JFrame {
     private void btnGestionarPedidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGestionarPedidoActionPerformed
         // TODO add your handling code here:
         // Instanciamos y abrimos la ventana de gestión de pedidos
-        FmrGestionPedidos ventanaGestion = new FmrGestionPedidos();
-        ventanaGestion.setLocationRelativeTo(this);
-        ventanaGestion.setVisible(true);
+        //FmrGestionPedidos ventanaGestion = new FmrGestionPedidos();
+        //ventanaGestion.setLocationRelativeTo(this);
+        //ventanaGestion.setVisible(true);
         
         // Cerramos el menú actual de ventas
         this.dispose();

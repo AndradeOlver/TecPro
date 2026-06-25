@@ -82,4 +82,26 @@ public class GestorVentas {
         
         // (Nota: Aquí en el futuro puedes agregar la llamada a PagoAbonoDAO para guardar el recibo físico)
     }
+    
+    public List<Pedido> obtenerHistorialPedidos() {
+    return pedidoDAO.obtenerTodos();
+    }
+       public Pedido obtenerDetallesDePedido(int codigo) {
+    Pedido pedido = pedidoDAO.buscarPorCodigo(codigo);
+    if (pedido != null) {
+        pedido.getDetalles().addAll(detallePedidoDAO.obtenerDetallesPorPedido(codigo));
+    }
+    return pedido;
+    }
+       public void avanzarEstadoPedido(int codigo) {
+    Pedido pedido = pedidoDAO.buscarPorCodigo(codigo);
+    if(pedido != null) {
+        pedido.avanzarEstado(); // Avanza al siguiente paso lógico
+        pedidoDAO.actualizarEstado(codigo, pedido.getEstado());
+    }
+    }
+       public void cancelarPedido(int codigo) {
+    pedidoDAO.actualizarEstado(codigo, "Cancelado");
+    // Opcional: Aquí podrías llamar al gestorInventario para devolver los productos al stock
+}
 }

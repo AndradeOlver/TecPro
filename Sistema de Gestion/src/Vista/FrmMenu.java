@@ -16,7 +16,7 @@ import Gestores.GestorVentas;
 public class FrmMenu extends javax.swing.JFrame {
    private GestorContactos gestorContactos = new GestorContactos();
     private GestorInventario gestorInventario = new GestorInventario();
-    private GestorVentas gestorVentas = new Gestores.GestorVentas();
+    private GestorVentas gestorVentas = new GestorVentas();
             
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrmMenu.class.getName());
 
@@ -113,7 +113,7 @@ public class FrmMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_jmiGenerarPedidoActionPerformed
 
     private void jmiGestionarPedidosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmiGestionarPedidosActionPerformed
-        FmrGestionPedidos ventanaGestion = new FmrGestionPedidos();
+        FmrGestionPedidos ventanaGestion = new FmrGestionPedidos(gestorVentas);
         ventanaGestion.setLocationRelativeTo(this);
         ventanaGestion.setVisible(true);
         this.setVisible(false);

@@ -38,6 +38,18 @@ public class Pedido {
        this.detallesVenta = new ArrayList<>();
        this.abonos = new ArrayList<>();
     }
+    public Pedido(int codigo, String fechaEmision, String fechaRecepcion, String estado, String tipoVenta, String fechaLimitePago, double deudaPendiente, Cliente cliente) {
+        this.codigo = codigo;
+        this.fechaEmision = fechaEmision;
+        this.fechaRecepcion = fechaRecepcion;
+        this.estado = estado;
+        this.tipoVenta = tipoVenta;
+        this.fechaLimitePago = fechaLimitePago;
+        this.deudaPendiente = deudaPendiente;
+        this.cliente = cliente;
+        this.detallesVenta = new ArrayList<>();
+        this.abonos = new ArrayList<>();
+    }
 
     public int getCodigo() {
         return codigo;
@@ -194,6 +206,15 @@ public class Pedido {
             this.setEstado("Cancelado"); 
         }
     
+    }
+    public void avanzarEstado() {
+        if (this.estado.equals("Pendiente")) {
+            this.setEstado("Entregado");
+        } else if (this.estado.equals("Activo")) {
+            this.setEstado("Pendiente");
+        } else {
+            throw new IllegalStateException("El pedido no puede avanzar. Estado actual: " + this.estado);
+        }
     }
 
     
