@@ -28,10 +28,8 @@
               <Group type="103" groupAlignment="1" attributes="0">
                   <Group type="102" attributes="0">
                       <Component id="btnProcesar" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="110" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="320" max="-2" attributes="0"/>
                       <Component id="btnCancelar" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="100" max="-2" attributes="0"/>
-                      <Component id="btnRegistrarPago" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
@@ -60,7 +58,6 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="btnProcesar" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnCancelar" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="btnRegistrarPago" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="55" max="-2" attributes="0"/>
           </Group>
@@ -176,14 +173,6 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCancelarActionPerformed"/>
-      </Events>
-    </Component>
-    <Component class="javax.swing.JButton" name="btnRegistrarPago">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Registrar Pago"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRegistrarPagoActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

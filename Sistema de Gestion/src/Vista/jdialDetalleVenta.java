@@ -29,17 +29,76 @@ public class jdialDetalleVenta extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        lblTitulo = new javax.swing.JLabel();
+        lblProveedor = new javax.swing.JLabel();
+        lblEstado = new javax.swing.JLabel();
+        lblTotal = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblDetalles = new javax.swing.JTable();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+        lblTitulo.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        lblTitulo.setText("Titulo");
+
+        lblProveedor.setText("Proveedor");
+
+        lblEstado.setText("Estado");
+
+        lblTotal.setText("Total");
+
+        tblDetalles.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Producto", "Cantidad", "Costo Unitario", "Sub Total"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(tblDetalles);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(34, 34, 34)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblProveedor)
+                    .addComponent(lblTitulo)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(lblEstado)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblTotal))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(36, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(24, Short.MAX_VALUE)
+                .addComponent(lblTitulo)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblProveedor)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblEstado)
+                    .addComponent(lblTotal))
+                .addGap(25, 25, 25))
         );
 
         pack();
@@ -48,40 +107,47 @@ public class jdialDetalleVenta extends javax.swing.JDialog {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+    public void cargarDetalles(Entidades.Pedido pedido) {
+        // 1. Llenamos las etiquetas (Labels) con la información del Cliente y el Pedido
+        lblTitulo.setText("Detalles del Pedido #" + pedido.getCodigo());
+        
+        // Nota: Si cambiaste el nombre del label a lblCliente en NetBeans, actualízalo aquí.
+        lblProveedor.setText("Cliente: " + pedido.getCliente().getNombre()); 
+        lblEstado.setText("Estado actual: " + pedido.getEstado());
 
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                jdialDetalleVenta dialog = new jdialDetalleVenta(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
+        // 2. Preparamos el modelo de la tabla
+        javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) tblDetalles.getModel();
+        modelo.setRowCount(0); // Limpia filas anteriores
+
+        double totalMonto = 0;
+
+        // 3. Lógica central: Recorremos los DetallesPedido en lugar de los Lotes
+        for (Entidades.DetallePedido detalle : pedido.getDetalles()) {
+            
+            // Matemática de ventas: Cantidad Vendida * Precio de Venta Congelado
+            double subtotal = detalle.getCantidadVendida() * detalle.getPrecioVentaCongelado();
+            totalMonto += subtotal;
+            
+            // Llenamos la fila con los datos extraídos
+            modelo.addRow(new Object[]{
+                detalle.getProducto().getDescripcion(),
+                detalle.getCantidadVendida(),
+                String.format("S/ %.2f", detalle.getPrecioVentaCongelado()),
+                String.format("S/ %.2f", subtotal)
+            });
+        }
+        
+        // 4. Mostramos el ingreso total calculado
+        lblTotal.setText(String.format("Total: S/ %.2f", totalMonto));
     }
+   
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblEstado;
+    private javax.swing.JLabel lblProveedor;
+    private javax.swing.JLabel lblTitulo;
+    private javax.swing.JLabel lblTotal;
+    private javax.swing.JTable tblDetalles;
     // End of variables declaration//GEN-END:variables
 }

@@ -74,7 +74,6 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         btnProcesar = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
-        btnRegistrarPago = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -131,9 +130,6 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
         btnCancelar.setText("Cancelar");
         btnCancelar.addActionListener(this::btnCancelarActionPerformed);
 
-        btnRegistrarPago.setText("Registrar Pago");
-        btnRegistrarPago.addActionListener(this::btnRegistrarPagoActionPerformed);
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -143,10 +139,8 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnProcesar)
-                        .addGap(110, 110, 110)
-                        .addComponent(btnCancelar)
-                        .addGap(100, 100, 100)
-                        .addComponent(btnRegistrarPago))
+                        .addGap(320, 320, 320)
+                        .addComponent(btnCancelar))
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                             .addComponent(btnRegresar)
@@ -167,8 +161,7 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
                 .addGap(30, 30, 30)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnProcesar)
-                    .addComponent(btnCancelar)
-                    .addComponent(btnRegistrarPago))
+                    .addComponent(btnCancelar))
                 .addGap(55, 55, 55))
         );
 
@@ -195,13 +188,6 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
             btnProcesar.setEnabled(true);
             btnCancelar.setEnabled(true);
             
-            // Si el pedido tiene deuda o es a crédito, habilitamos el cobro
-            String estado = tblPedidos.getValueAt(fila, 4).toString();
-            if (estado.equalsIgnoreCase("Pendiente") || estado.equalsIgnoreCase("Abonada")) {
-                btnRegistrarPago.setEnabled(true);
-            } else {
-                btnRegistrarPago.setEnabled(false);
-            }
         }
     }//GEN-LAST:event_tblPedidosMouseReleased
 
@@ -212,7 +198,7 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
             if (fila != -1) {
                 int codigo = Integer.parseInt(tblPedidos.getValueAt(fila, 0).toString());
                 
-                Pedido pedidoCompleto = gestorVentas.obtenerDetallesDePedido(codigoPedido);
+                Pedido pedidoCompleto = gestorVentas.obtenerDetallesDePedido(codigo);
                 
                 if (pedidoCompleto != null) {
                     // Necesitarás crear un jdialVerDetalleVenta similar al de compras
@@ -254,46 +240,6 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_btnCancelarActionPerformed
-
-    private void btnRegistrarPagoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarPagoActionPerformed
-        // TODO add your handling code here:
-        int fila = tblPedidos.getSelectedRow();
-        if (fila != -1) {
-            // 1. Extraemos el código de la primera columna
-            int codigo = Integer.parseInt(tblPedidos.getValueAt(fila, 0).toString());
-            
-            // 2. Traemos el pedido fresco desde la base de datos para ver la deuda real
-            Pedido pedido = gestorVentas.obtenerDetallesDePedido(codigo);
-            
-            if (pedido != null && pedido.getDeudaPendiente() > 0) {
-                // 3. Solicitamos el ingreso del abono
-                String input = javax.swing.JOptionPane.showInputDialog(this, 
-                    "Deuda pendiente: S/ " + pedido.getDeudaPendiente() + "\n\nIngrese el monto a abonar:");
-                
-                // 4. Verificamos que no haya cancelado la ventana o enviado vacío
-                if (input != null && !input.trim().isEmpty()) {
-                    try {
-                        // Cambiamos comas por puntos por si el usuario se equivoca al tipear
-                        double abono = Double.parseDouble(input.replace(",", "."));
-                        
-                        // 5. Enviamos la orden al gestor
-                        gestorVentas.registrarPagoAbono(codigo, abono);
-                        javax.swing.JOptionPane.showMessageDialog(this, "Abono registrado con éxito.");
-                        
-                        // 6. Refrescamos la tabla para que la interfaz muestre el nuevo saldo
-                        actualizarTabla();
-                        
-                    } catch (NumberFormatException e) {
-                        javax.swing.JOptionPane.showMessageDialog(this, "Por favor, ingrese un monto numérico válido.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-                    } catch (Exception ex) {
-                        javax.swing.JOptionPane.showMessageDialog(this, ex.getMessage(), "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
-                    }
-                }
-            } else {
-                javax.swing.JOptionPane.showMessageDialog(this, "Este pedido no tiene deuda pendiente.", "Aviso", javax.swing.JOptionPane.INFORMATION_MESSAGE);
-            }
-        }
-    }//GEN-LAST:event_btnRegistrarPagoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -350,7 +296,6 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnProcesar;
-    private javax.swing.JButton btnRegistrarPago;
     private javax.swing.JButton btnRegresar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;

@@ -14,11 +14,11 @@ import java.sql.SQLException;
 public class ConexionSQL {
     // 1. Los Parámetros de Ruta (Cadena de Conexión)
     // Reemplaza "NombreDeTuBD", "tu_usuario" y "tu_contraseña" con tus datos reales.
-    private static final String SERVIDOR = "sql5101.site4now.net";
+    private static final String SERVIDOR = "localhost";
     private static final String PUERTO = "1433";
-    private static final String BASE_DATOS = "db_acb22b_proyectoelvia";
-    private static final String USUARIO = "db_acb22b_proyectoelvia_admin";
-    private static final String CLAVE = "Elllara140";
+    private static final String BASE_DATOS = "GESTOR";
+    private static final String USUARIO = "sa";
+    private static final String CLAVE = "olverandradesql";
     
     // URL formateada para el driver de Microsoft
     private static final String URL = "jdbc:sqlserver://" + SERVIDOR + ":" + PUERTO + 
@@ -64,5 +64,3 @@ public class ConexionSQL {
         }
     }
 }
-    
-
