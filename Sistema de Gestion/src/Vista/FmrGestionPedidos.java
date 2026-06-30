@@ -216,12 +216,30 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
         int fila = tblPedidos.getSelectedRow();
         if (fila != -1) {
             try {
+                // 1. Obtenemos el código del pedido de la primera columna (índice 0)
                 int codigo = Integer.parseInt(tblPedidos.getValueAt(fila, 0).toString());
-                gestorVentas.avanzarEstadoPedido(codigo);
-                javax.swing.JOptionPane.showMessageDialog(this, "Pedido avanzado/procesado con éxito.");
-                actualizarTabla(); // En JFrame, en vez de cerrar (dispose), actualizamos la tabla
+                
+                // 2. Traemos el pedido completamente fresco desde la base de datos
+                Pedido pedidoCompleto = gestorVentas.obtenerDetallesDePedido(codigo);
+
+                if (pedidoCompleto != null) {
+                    if (pedidoCompleto.getDeudaPendiente() > 0) {
+                        // 3. Abrimos nuestra nueva ventana de caja
+                        jdialProcesarVenta caja = new jdialProcesarVenta(this, true);
+                        caja.prepararCobro(pedidoCompleto, gestorVentas);
+                        caja.setLocationRelativeTo(this);
+                        
+                        // El programa principal se pausa aquí hasta que la ventana de caja se cierre
+                        caja.setVisible(true); 
+                        
+                        // 4. Al cerrarse la caja, actualizamos la tabla para ver el saldo en cero
+                        actualizarTabla(); 
+                    } else {
+                        javax.swing.JOptionPane.showMessageDialog(this, "Este pedido ya está totalmente pagado.", "Aviso", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }
             } catch (Exception ex) {
-                javax.swing.JOptionPane.showMessageDialog(this, ex.getMessage(), "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+                javax.swing.JOptionPane.showMessageDialog(this, "Error al abrir cobro: " + ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             }
         }
     }//GEN-LAST:event_btnProcesarActionPerformed

@@ -38,21 +38,19 @@ public class GestorVentas {
 
         // 1. Guardamos la cabecera del Pedido en SQL Server
         boolean pedidoGuardado = pedidoDAO.registrar(nuevoPedido);
-        
         if (!pedidoGuardado) {
             throw new RuntimeException("Error crítico: Falló la creación del pedido en la base de datos.");
         }
 
         // 2. Guardamos todos los productos de ese pedido (Detalles) en SQL Server
         boolean detallesGuardados = detallePedidoDAO.registrarDetalles(nuevoPedido.getCodigo(), nuevoPedido.getDetalles());
-        
         if (!detallesGuardados) {
             throw new RuntimeException("Error crítico: Falló la creación de los detalles del pedido.");
         }
 
-        // 3. Descontamos el stock físico del inventario (Regla de negocio)
-        // Solo descontamos si el estado implica que la mercadería salió
-        if (!nuevoPedido.getEstado().equalsIgnoreCase("Anulado")) {
+        // 3. LA NUEVA LÓGICA DE INVENTARIO
+        // Solo descontamos físicamente de la base de datos si el pedido ya fue entregado al cliente
+        if (nuevoPedido.getEstado().equalsIgnoreCase("Entregado")) {
             for (DetallePedido dp : nuevoPedido.getDetalles()) {
                 // Pasamos el ID del producto y la cantidad en NEGATIVO para restar
                 gestorInventario.modificarStock(dp.getProducto().getId(), -dp.getCantidadVendida());
@@ -93,15 +91,36 @@ public class GestorVentas {
     }
     return pedido;
     }
-       public void avanzarEstadoPedido(int codigo) {
-    Pedido pedido = pedidoDAO.buscarPorCodigo(codigo);
-    if(pedido != null) {
-        pedido.avanzarEstado(); // Avanza al siguiente paso lógico
-        pedidoDAO.actualizarEstado(codigo, pedido.getEstado());
+    public void avanzarEstadoPedido(int codigo) {
+        // Usamos obtenerDetallesDePedido en lugar de buscarPorCodigo para traer la lista de productos
+        Pedido pedido = obtenerDetallesDePedido(codigo); 
+        
+        if(pedido != null) {
+            pedido.avanzarEstado(); // Cambia el estado internamente según tus reglas
+            pedidoDAO.actualizarEstado(codigo, pedido.getEstado());
+            
+            // Si el nuevo estado tras avanzar es "Entregado", ejecutamos la salida de almacén
+            if (pedido.getEstado().equalsIgnoreCase("Entregado")) {
+                for (DetallePedido dp : pedido.getDetalles()) {
+                    gestorInventario.modificarStock(dp.getProducto().getId(), -dp.getCantidadVendida());
+                }
+            }
+        }
     }
+    
+    public void cancelarPedido(int codigo) {
+        Pedido pedido = obtenerDetallesDePedido(codigo);
+        
+        if (pedido != null) {
+            // Si el pedido ya había salido del almacén, devolvemos el stock
+            if (pedido.getEstado().equalsIgnoreCase("Entregado")) {
+                for (DetallePedido dp : pedido.getDetalles()) {
+                    // Pasamos la cantidad en POSITIVO para que sume al inventario
+                    gestorInventario.modificarStock(dp.getProducto().getId(), dp.getCantidadVendida()); 
+                }
+            }
+            // Finalmente, actualizamos la base de datos marcándolo como Cancelado
+            pedidoDAO.actualizarEstado(codigo, "Cancelado");
+        }
     }
-       public void cancelarPedido(int codigo) {
-    pedidoDAO.actualizarEstado(codigo, "Cancelado");
-    // Opcional: Aquí podrías llamar al gestorInventario para devolver los productos al stock
-}
 }

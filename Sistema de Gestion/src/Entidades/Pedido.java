@@ -68,10 +68,12 @@ public class Pedido {
     }
 
     public void setFechaRecepcion(String fechaRecepcion) {
-        if (esFechaMayor(this.fechaEmision, fechaRecepcion)) {
+       // La validación ahora permite que sea el mismo día (mayor o igual)
+        if (esFechaValidaPosteriorOIgual(this.fechaEmision, fechaRecepcion)) {
             this.fechaRecepcion = fechaRecepcion;
         } else {
-            throw new IllegalArgumentException("Error: La fecha de recepción debe ser posterior a la fecha de emisión.");
+            // El mensaje cambia: ya no es "debe ser posterior", sino "no puede ser anterior"
+            throw new IllegalArgumentException("Error: La fecha de recepción no puede ser anterior a la fecha de emisión.");
         }
     }
 
@@ -104,10 +106,12 @@ public class Pedido {
     }
 
     public void setFechaLimitePago(String fechaLimitePago) {
-        if (esFechaMayor(this.fechaEmision, fechaLimitePago)) {
+        // Cambiamos el validador para usar la regla "mayor o igual" (permite ventas al Contado el mismo día)
+        if (esFechaValidaPosteriorOIgual(this.fechaEmision, fechaLimitePago)) {
             this.fechaLimitePago = fechaLimitePago;
         } else {
-            throw new IllegalArgumentException("Error: La fecha límite de pago debe ser posterior a la fecha de emisión.");
+            // Actualizamos el mensaje por coherencia semántica
+            throw new IllegalArgumentException("Error: La fecha límite de pago no puede ser anterior a la fecha de emisión.");
         }
     }
 
@@ -138,16 +142,7 @@ public class Pedido {
     return this.detallesVenta;
 }
     
-    private boolean esFechaMayor(String fechaBase, String fechaAComparar) {
-        if (fechaBase == null || fechaAComparar == null) return false;
-        try {
-            LocalDate fecha1 = LocalDate.parse(fechaBase);
-            LocalDate fecha2 = LocalDate.parse(fechaAComparar);
-            return fecha2.isAfter(fecha1);
-        } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("Error: Formato de fecha inválido. Utilice el formato AAAA-MM-DD.");
-        }
-    }
+   
     
     public void agregarDetalleVenta(DetallePedido detalle){
         
@@ -214,6 +209,22 @@ public class Pedido {
             this.setEstado("Pendiente");
         } else {
             throw new IllegalStateException("El pedido no puede avanzar. Estado actual: " + this.estado);
+        }
+    }
+    private boolean esFechaValidaPosteriorOIgual(String fechaEmision, String fechaRecepcion) {
+        try {
+            // 1. Transformamos el texto crudo en objetos de fecha reales
+            java.time.LocalDate emision = java.time.LocalDate.parse(fechaEmision);
+            java.time.LocalDate recepcion = java.time.LocalDate.parse(fechaRecepcion);
+            
+            // 2. La lógica de evaluación: 
+            // Retorna TRUE si la recepción NO es anterior a la emisión.
+            return !recepcion.isBefore(emision);
+            
+        } catch (java.time.format.DateTimeParseException e) {
+            // Manejo estructural en caso de que el texto venga vacío o corrupto
+            System.err.println("Error lógico: El formato de la fecha es inválido.");
+            return false;
         }
     }
 
