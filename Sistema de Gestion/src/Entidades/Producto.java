@@ -9,7 +9,7 @@ package Entidades;
  * @author equipo
  */
 public class Producto {
-    private static int contadorGlobal = 100000;
+   
     private int id;
     private String descripcion;
     private Double precioVentaBase;
@@ -18,7 +18,7 @@ public class Producto {
     
     // 1. CONSTRUCTOR PARA CREAR PRODUCTOS NUEVOS DESDE LA INTERFAZ
     public Producto(String descripcion, double precioVentaBase, double precioCompra, int stock) {
-        this.id = contadorGlobal++;
+       
         setDescripcion(descripcion);
         setPrecioCompra(precioCompra); // IMPORTANTE: Setear compra primero para la validación
         setPrecioVentaBase(precioVentaBase);
@@ -27,7 +27,7 @@ public class Producto {
 
     // 2. CONSTRUCTOR PARA PRODUCTOS VACÍOS (Borradores)
     public Producto(String descripcion) {
-        this.id = contadorGlobal++;
+        
         setDescripcion(descripcion);
         this.precioVentaBase = null;
         this.precioCompra = null;
@@ -112,6 +112,9 @@ public class Producto {
         } else {
             throw new IllegalArgumentException("Error: El stock debe ser mayor o igual a 0.");
         }
+    }
+    public void setId(int id) {
+        this.id = id;
     }
     
     public void actualizarStock(int cantidad, String tipoMovimiento) {

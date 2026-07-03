@@ -14,34 +14,39 @@ import java.util.List;
 public class PedidoDAO {
 
     public boolean registrar(Pedido p) {
-        String sql = "INSERT INTO Pedido (Codigo, Cliente_ID, FechaEmision, FechaRecepcion, Estado, TipoVenta, FechaLimitePago, DeudaPendiente) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Pedido (Cliente_ID, FechaEmision, FechaRecepcion, Estado, TipoVenta, FechaLimitePago, DeudaPendiente) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = ConexionSQL.probarConexion(); 
-             PreparedStatement ps = con.prepareStatement(sql)) {
+             PreparedStatement ps = con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);) {
             
-            ps.setInt(1, p.getCodigo());
-            ps.setInt(2, p.getCliente().getCodigo()); // Asumiendo que Pedido tiene un objeto Cliente
+            
+            ps.setInt(1, p.getCliente().getCodigo()); // Asumiendo que Pedido tiene un objeto Cliente
             
             // Convertir fechas de Java a SQL
-            ps.setDate(3, java.sql.Date.valueOf(p.getFechaEmision()));
+            ps.setDate(2, java.sql.Date.valueOf(p.getFechaEmision()));
             
             if (p.getFechaRecepcion() != null) {
-                ps.setDate(4, java.sql.Date.valueOf(p.getFechaRecepcion()));
+                ps.setDate(3, java.sql.Date.valueOf(p.getFechaRecepcion()));
             } else {
-                ps.setNull(4, java.sql.Types.DATE);
+                ps.setNull(3, java.sql.Types.DATE);
             }
             
-            ps.setString(5, p.getEstado());
-            ps.setString(6, p.getTipoVenta());
+            ps.setString(4, p.getEstado());
+            ps.setString(5, p.getTipoVenta());
             
             if (p.getFechaLimitePago() != null) {
-                ps.setDate(7, java.sql.Date.valueOf(p.getFechaLimitePago()));
+                ps.setDate(6, java.sql.Date.valueOf(p.getFechaLimitePago()));
             } else {
-                ps.setNull(7, java.sql.Types.DATE);
+                ps.setNull(6, java.sql.Types.DATE);
             }
             
-            ps.setDouble(8, p.getDeudaPendiente());
+            ps.setDouble(7, p.getDeudaPendiente());
             
             ps.execute();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+            if (rs.next()) {
+                p.setCodigo(rs.getInt(1));
+            }
+}
             return true;
         } catch (SQLException e) {
             System.err.println("Error al registrar el pedido: " + e.getMessage());

@@ -12,35 +12,40 @@ import java.util.List;
 public class ProductoDAO {
 
     public boolean registrar(Producto p) {
-        String sql = "INSERT INTO Producto (ID, Descripcion, PrecioVentaBase, PrecioCompra, Stock) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Producto (Descripcion, PrecioVentaBase, PrecioCompra, Stock) VALUES (?, ?, ?, ?)";
         try (Connection con = ConexionSQL.probarConexion(); 
-             PreparedStatement ps = con.prepareStatement(sql)) {
+             PreparedStatement ps = con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);) {
             
-            ps.setInt(1, p.getId());
-            ps.setString(2, p.getDescripcion());
+          
+            ps.setString(1, p.getDescripcion());
             
             // Validación para Precio de Venta
             if (p.getPrecioVentaBase() != null) {
-                ps.setDouble(3, p.getPrecioVentaBase());
+                ps.setDouble(2, p.getPrecioVentaBase());
             } else {
-                ps.setNull(3, java.sql.Types.DECIMAL);
+                ps.setNull(2, java.sql.Types.DECIMAL);
             }
             
             // Validación para Precio de Compra
             if (p.getPrecioCompra() != null) {
-                ps.setDouble(4, p.getPrecioCompra());
+                ps.setDouble(3, p.getPrecioCompra());
             } else {
-                ps.setNull(4, java.sql.Types.DECIMAL);
+                ps.setNull(3, java.sql.Types.DECIMAL);
             }
             
             // Validación para Stock
             if (p.getStock() != null) {
-                ps.setInt(5, p.getStock());
+                ps.setInt(4, p.getStock());
             } else {
-                ps.setNull(5, java.sql.Types.INTEGER);
+                ps.setNull(4, java.sql.Types.INTEGER);
             }
             
             ps.execute();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    p.setId(rs.getInt(1)); 
+                }
+            }
             return true;
         } catch (SQLException e) {
             System.err.println("Error al registrar producto: " + e.getMessage());

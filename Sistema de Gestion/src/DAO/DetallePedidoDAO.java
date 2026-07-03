@@ -56,14 +56,16 @@ public class DetallePedidoDAO {
                 
                 while (rs.next()) {
                     Producto p = pDAO.buscarPorId(rs.getInt("Producto_ID"));
-                    
-                    if(p != null) {
-                        DetallePedido dp = new DetallePedido(
-                            rs.getInt("CantidadVendida"), 
-                            rs.getDouble("PrecioVentaCongelado"), 
-                            p
-                        );
-                        lista.add(dp);
+                    if (p != null) {
+                         // Utilizamos el nuevo constructor pasándole el ID real de la base de datos
+                         DetallePedido dp = new DetallePedido(
+                             0, // <-- Pasamos un 0 como código "ficticio" para forzar el constructor histórico
+                             rs.getInt("CantidadVendida"), 
+                             rs.getDouble("PrecioVentaCongelado"), 
+                             p
+                         );
+                         // ¡ESTA ES LA LÍNEA MÁGICA QUE FALTA!
+                            lista.add(dp);
                     }
                 }
             }

@@ -11,7 +11,7 @@ import java.util.Objects;
  * @author equipo
  */
 public class LoteProducto {
-    private static int contadorGlobal = 600000;
+    
     private int codigo;
     private int cantidadIngresada;
     private double precioCompraIndividual;
@@ -19,9 +19,15 @@ public class LoteProducto {
     private Producto producto;
     
  public LoteProducto( int cantidadIngresada, double precioCompraIndividual, Producto producto) {
-        this.codigo = contadorGlobal++;
+        this.codigo = 0;
         setCantidadIngresada(cantidadIngresada);
         setPrecioCompraIndividual(precioCompraIndividual);
+        setProducto(producto);
+    }
+ public LoteProducto(int codigoBD, int cantidadIngresada, double precioCompraIndividual, Producto producto) {
+        this.codigo = codigoBD; 
+        setCantidadIngresada(cantidadIngresada);
+        this.precioCompraIndividual = precioCompraIndividual;
         setProducto(producto);
     }
     public int getCodigo() { return codigo; }

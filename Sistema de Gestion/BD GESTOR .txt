@@ -1,0 +1,414 @@
+-- 1. VERIFICAR Y BORRAR LA BASE DE DATOS SI YA EXISTE
+IF EXISTS (SELECT name FROM sys.databases WHERE name = N'GESTOR')
+BEGIN
+    -- Cierra cualquier conexión activa para poder borrarla sin errores
+    ALTER DATABASE GESTOR SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE GESTOR;
+END
+GO
+
+-- 2. CREAR LA BASE DE DATOS LIMPIA
+CREATE DATABASE GESTOR;
+GO
+
+USE GESTOR;
+GO
+
+-- 3. CREACIÓN DE TABLAS MAESTRAS (Sin dependencias)
+
+CREATE TABLE Cliente (
+    ID INT PRIMARY KEY, -- Ingresado manualmente (DNI)
+    Nombre VARCHAR(150) NOT NULL,
+    Direccion VARCHAR(200),
+    Correo VARCHAR(100),
+    NumeroContacto VARCHAR(15)
+)
+GO
+
+CREATE TABLE Proveedor (
+    RUC VARCHAR(11) PRIMARY KEY, -- Ingresado manualmente (RUC)
+    RazonSocial VARCHAR(150) NOT NULL,
+    Contacto VARCHAR(100),
+    Direccion VARCHAR(200),
+    NumeroContacto VARCHAR(15),
+    CorreoContacto VARCHAR(100)
+)
+GO
+
+CREATE TABLE Producto (
+    ID INT PRIMARY KEY IDENTITY(100000, 1), -- Autoincrementable
+    Descripcion VARCHAR(150) NOT NULL,
+    PrecioVentaBase DECIMAL(10, 2),
+    PrecioCompra DECIMAL(10, 2),
+    Stock INT DEFAULT 0
+)
+GO
+
+-- 4. CREACIÓN DE TABLAS TRANSACCIONALES (Dependen de las maestras)
+
+CREATE TABLE Pedido (
+    Codigo INT PRIMARY KEY IDENTITY(200000, 1), -- Autoincrementable
+    Cliente_ID INT NOT NULL REFERENCES Cliente(ID),
+    FechaEmision DATE NOT NULL,
+    FechaRecepcion DATE,
+    Estado VARCHAR(50) NOT NULL,
+    TipoVenta VARCHAR(50) NOT NULL,
+    FechaLimitePago DATE,
+    DeudaPendiente DECIMAL(10, 2) DEFAULT 0.00
+)
+GO
+
+CREATE TABLE OrdenCompra (
+    Codigo INT PRIMARY KEY, -- Calculado con MAX(Codigo) + 1 en Java
+    Proveedor_RUC VARCHAR(11) NOT NULL REFERENCES Proveedor(RUC),
+    FechaIngreso DATE NOT NULL,
+    Estado VARCHAR(50) NOT NULL
+)
+GO
+
+-- 5. CREACIÓN DE TABLAS DE DETALLES (Llaves compuestas)
+
+CREATE TABLE DetallePedido (
+    Pedido_Codigo INT NOT NULL REFERENCES Pedido(Codigo),
+    Producto_ID INT NOT NULL REFERENCES Producto(ID),
+    CantidadVendida INT NOT NULL,
+    PrecioVentaCongelado DECIMAL(10, 2) NOT NULL,
+    PRIMARY KEY (Pedido_Codigo, Producto_ID)
+)
+GO
+
+CREATE TABLE LoteProducto (
+    OrdenCompra_Codigo INT NOT NULL REFERENCES OrdenCompra(Codigo),
+    Producto_ID INT NOT NULL REFERENCES Producto(ID),
+    CantidadIngresada INT NOT NULL,
+    PrecioCompraIndividual DECIMAL(10, 2) NOT NULL,
+    PRIMARY KEY (OrdenCompra_Codigo, Producto_ID)
+)
+GO
+
+-- 6. CREACIÓN DE TABLAS DE HISTORIAL Y FINANZAS
+
+CREATE TABLE PagoAbono (
+    CodigoRecibo INT PRIMARY KEY IDENTITY(400000, 1), -- Autoincrementable
+    Pedido_Codigo INT NOT NULL REFERENCES Pedido(Codigo),
+    FechaAbono DATE NOT NULL,
+    MontoAbonado DECIMAL(10, 2) NOT NULL
+)
+GO
+
+CREATE TABLE MovimientosKardex (
+    IdMovimiento INT PRIMARY KEY IDENTITY(100000, 1), -- Autoincrementable
+    Producto_ID INT NOT NULL REFERENCES Producto(ID),
+    FechaMovimiento DATE NOT NULL,
+    TipoMovimiento VARCHAR(50) NOT NULL,
+    CantidadFisica INT NOT NULL,
+    ValorUnitario DECIMAL(10, 2) NOT NULL,
+    SaldoCantidadActual INT NOT NULL,
+    SaldoCostoPromedio DECIMAL(10, 2) NOT NULL
+)
+GO
+
+
+-- =====================================================================
+-- 1. CLIENTES (Datos 100% ficticios)
+-- =====================================================================
+INSERT INTO Cliente (ID, Nombre, Direccion, Correo, NumeroContacto) VALUES 
+(10000001, 'Empresa Alpha S.A.', 'Av. Los Libertadores 100', 'ventas@alpha.com', '900111000'),
+(10000002, 'Corporacion Beta EIRL', 'Calle Industrial 250', 'logistica@beta.com', '900222000'),
+(10000003, 'Juan Manuel Perez', 'Urb. Las Flores 301', 'jperez@correo.com', '900333000'),
+(10000004, 'Maria Fernanda Lopez', 'Av. Central 404', 'mflopez@correo.com', '900444000'),
+(10000005, 'Distribuidora Gamma', 'Mz H Lote 12 Zona Sur', 'contacto@gamma.com', '900555000'),
+(10000006, 'Carlos Augusto Ruiz', 'Condominio El Sol 55', 'cruiz88@correo.com', '900666000'),
+(10000007, 'Ana Patricia Silva', 'Av. Republica 999', 'asilva@correo.com', '900777000'),
+(10000008, 'Inversiones Delta SAC', 'Parque Industrial 2', 'admin@delta.pe', '900888000'),
+(10000009, 'Roberto Suarez', 'Calle Las Gaviotas 12', 'rsuarez@correo.com', '900999000'),
+(10000010, 'Comercializadora Omega', 'Av. Universitaria 1010', 'gerencia@omega.pe', '900101010');
+GO
+
+-- =====================================================================
+-- 2. PROVEEDORES (RUCs y datos genéricos)
+-- =====================================================================
+INSERT INTO Proveedor (RUC, RazonSocial, Contacto, Direccion, NumeroContacto, CorreoContacto) VALUES 
+('20100000001', 'Tech Global Supplies SAC', 'Andres Villar', 'Zona Franca 1', '910100100', 'andres.v@techglobal.com'),
+('20200000002', 'Importaciones Electro Max', 'Lucia Fernandez', 'Polvos Azules 200', '920200200', 'ventas@electromax.pe'),
+('20300000003', 'Mayorista Central de Suministros', 'Jorge Ramirez', 'Mercado Central 33', '930300300', 'pedidos@mayorista.com'),
+('20400000004', 'Inversiones Hardware & Software', 'Elena Gomez', 'Av. Wilson 400', '940400400', 'elena@hardandsoft.pe'),
+('20500000005', 'Distribuidora Tecnologica Sur', 'Marcos Pinto', 'Av. Arequipa 500', '950500500', 'mpinto@tecnosur.com');
+GO
+
+-- =====================================================================
+-- 3. PRODUCTOS (Omitimos el ID para que inicie en 100000 automáticamente)
+-- =====================================================================
+INSERT INTO Producto (Descripcion, PrecioVentaBase, PrecioCompra, Stock) VALUES 
+('Laptop Profesional 15" Core i7', 3500.00, 2800.00, 50),
+('Laptop Estudiante 14" Core i5', 2200.00, 1800.00, 80),
+('Monitor 24" FHD IPS', 650.00, 450.00, 40),
+('Monitor 27" Curvo 144Hz', 1200.00, 900.00, 20),
+('Teclado Mecanico RGB Switches Blue', 180.00, 110.00, 100),
+('Teclado Inalambrico Estandar', 60.00, 35.00, 150),
+('Mouse Inalambrico Ergonomico', 80.00, 45.00, 200),
+('Mouse Gamer Optico 10000 DPI', 150.00, 90.00, 85),
+('Auriculares con Microfono USB', 120.00, 75.00, 110),
+('Auriculares Bluetooth Over-Ear', 250.00, 160.00, 60),
+('Disco Duro Externo 1TB USB 3.0', 220.00, 160.00, 90),
+('Unidad SSD M.2 NVMe 500GB', 280.00, 200.00, 70),
+('Memoria RAM 16GB DDR4 3200MHz', 190.00, 140.00, 120),
+('Impresora Multifuncional Tinta Continua', 850.00, 650.00, 25),
+('Impresora Laser Monocromatica', 600.00, 450.00, 15),
+('Silla Ergonomica de Oficina', 450.00, 300.00, 30),
+('Cable HDMI 2.0 de 2 Metros', 25.00, 10.00, 300),
+('Base Refrigerante para Laptop', 80.00, 45.00, 55),
+('Webcam HD 1080p con Microfono', 160.00, 100.00, 45),
+('Licencia Antivirus 1 Año (Caja)', 90.00, 50.00, 100);
+GO
+
+-- =====================================================================
+-- 4. ORDENES DE COMPRA (ID manual)
+-- =====================================================================
+INSERT INTO OrdenCompra (Codigo, Proveedor_RUC, FechaIngreso, Estado) VALUES 
+(300000, '20100000001', '2026-01-10', 'Procesada'),
+(300001, '20200000002', '2026-02-15', 'Procesada'),
+(300002, '20300000003', '2026-03-20', 'Procesada'),
+(300003, '20400000004', '2026-04-05', 'Pendiente'),
+(300004, '20500000005', '2026-05-12', 'Solicitada');
+GO
+
+-- =====================================================================
+-- 5. LOTES DE PRODUCTOS (Detalles de las compras)
+-- Respetando IDs generados: Producto 100000 a 100019
+-- =====================================================================
+INSERT INTO LoteProducto (OrdenCompra_Codigo, Producto_ID, CantidadIngresada, PrecioCompraIndividual) VALUES 
+(300000, 100000, 50, 2800.00), -- 50 Laptops i7
+(300000, 100001, 80, 1800.00), -- 80 Laptops i5
+(300001, 100002, 40, 450.00),  -- 40 Monitores 24"
+(300001, 100003, 20, 900.00),  -- 20 Monitores 27"
+(300002, 100004, 100, 110.00), -- 100 Teclados Mecanicos
+(300002, 100006, 200, 45.00),  -- 200 Mouses
+(300003, 100010, 90, 160.00),  -- 90 Discos Externos
+(300003, 100011, 70, 200.00);  -- 70 SSDs
+GO
+
+-- =====================================================================
+-- 6. PEDIDOS / VENTAS (ID autoincrementable desde 200000)
+-- =====================================================================
+INSERT INTO Pedido (Cliente_ID, FechaEmision, FechaRecepcion, Estado, TipoVenta, FechaLimitePago, DeudaPendiente) VALUES 
+(10000001, '2026-01-15', '2026-01-16', 'Entregado', 'Credito', '2026-02-15', 7000.00),
+(10000002, '2026-02-20', '2026-02-20', 'Entregado', 'Contado', '2026-02-20', 0.00),
+(10000003, '2026-03-05', '2026-03-06', 'Entregado', 'Contado', '2026-03-05', 0.00),
+(10000004, '2026-03-10', NULL, 'Pendiente', 'Credito', '2026-04-10', 2200.00),
+(10000005, '2026-04-01', '2026-04-02', 'Entregado', 'Contado', '2026-04-01', 0.00),
+(10000006, '2026-04-15', NULL, 'Pendiente', 'Credito', '2026-05-15', 180.00),
+(10000007, '2026-05-02', '2026-05-03', 'Entregado', 'Contado', '2026-05-02', 0.00),
+(10000008, '2026-05-20', NULL, 'Activo', 'Credito', '2026-06-20', 2600.00),
+(10000009, '2026-06-01', NULL, 'Activo', 'Contado', '2026-06-01', 1200.00),
+(10000010, '2026-06-10', NULL, 'Pendiente', 'Credito', '2026-07-10', 850.00);
+GO
+
+-- =====================================================================
+-- 7. DETALLES DE PEDIDOS (Qué productos se vendieron en cada factura)
+-- =====================================================================
+INSERT INTO DetallePedido (Pedido_Codigo, Producto_ID, CantidadVendida, PrecioVentaCongelado) VALUES 
+(200000, 100000, 2, 3500.00), -- Pedido 1: 2 Laptops i7 (7000.00 deuda total que coincide arriba)
+(200001, 100002, 5, 650.00),  -- Pedido 2: 5 Monitores 24"
+(200001, 100004, 5, 180.00),  -- Pedido 2: 5 Teclados Mecanicos (Total pagado al contado 4150.00)
+(200002, 100001, 1, 2200.00), -- Pedido 3: 1 Laptop i5
+(200003, 100001, 1, 2200.00), -- Pedido 4: 1 Laptop i5 (a credito)
+(200004, 100006, 10, 80.00),  -- Pedido 5: 10 Mouses 
+(200005, 100004, 1, 180.00),  -- Pedido 6: 1 Teclado (a credito)
+(200006, 100016, 5, 25.00),   -- Pedido 7: 5 Cables HDMI
+(200007, 100003, 2, 1200.00), -- Pedido 8: 2 Monitores Curvos
+(200007, 100011, 1, 200.00),  -- Pedido 8: 1 SSD
+(200008, 100003, 1, 1200.00), -- Pedido 9: 1 Monitor Curvo
+(200009, 100013, 1, 850.00);  -- Pedido 10: 1 Impresora
+GO
+
+-- =====================================================================
+-- 8. RECIBOS DE PAGOS / ABONOS (ID autoincrementable desde 400000)
+-- Justifican a los que tienen DeudaPendiente en 0.00
+-- =====================================================================
+INSERT INTO PagoAbono (Pedido_Codigo, FechaAbono, MontoAbonado) VALUES 
+(200001, '2026-02-20', 4150.00), -- Pago total al contado pedido 200001
+(200002, '2026-03-05', 2200.00), -- Pago total al contado pedido 200002
+(200004, '2026-04-01', 800.00),  -- Pago total al contado pedido 200004
+(200006, '2026-05-02', 125.00),  -- Pago total al contado pedido 200006
+(200008, '2026-06-01', 1200.00); -- Pago total al contado pedido 200008
+GO
+
+-- =====================================================================
+-- 9. MOVIMIENTOS KARDEX (Historial de Almacen)
+-- =====================================================================
+INSERT INTO MovimientosKardex (Producto_ID, FechaMovimiento, TipoMovimiento, CantidadFisica, ValorUnitario, SaldoCantidadActual, SaldoCostoPromedio) VALUES 
+-- Entradas
+(100000, '2026-01-10', 'entrada', 50, 2800.00, 50, 2800.00),
+(100001, '2026-01-10', 'entrada', 80, 1800.00, 80, 1800.00),
+(100002, '2026-02-15', 'entrada', 40, 450.00, 40, 450.00),
+(100003, '2026-02-15', 'entrada', 20, 900.00, 20, 900.00),
+(100004, '2026-03-20', 'entrada', 100, 110.00, 100, 110.00),
+-- Salidas
+(100000, '2026-01-16', 'salida', 2, 2800.00, 48, 2800.00),
+(100002, '2026-02-20', 'salida', 5, 450.00, 35, 450.00),
+(100004, '2026-02-20', 'salida', 5, 110.00, 95, 110.00),
+(100001, '2026-03-06', 'salida', 1, 1800.00, 79, 1800.00);
+GO
+
+-- =====================================================================
+-- 1. MÁS CLIENTES (IDs 10000011 al 10000030)
+-- =====================================================================
+INSERT INTO Cliente (ID, Nombre, Direccion, Correo, NumeroContacto) VALUES 
+(10000011, 'Constructora Los Andes SAC', 'Av. Javier Prado 1500', 'logistica@andes.pe', '911111111'),
+(10000012, 'Clinica San Marcos', 'Calle Las Retamas 405', 'compras@clinicasm.com', '911111112'),
+(10000013, 'Eduardo Palacios', 'Urb. Los Cedros Mz A Lote 4', 'epalacios@correo.com', '911111113'),
+(10000014, 'Valeria Montes', 'Condominio Bella Vista', 'vmontes@correo.com', '911111114'),
+(10000015, 'Restaurante El Buen Sabor', 'Av. Larco 880', 'admin@buensabor.com', '911111115'),
+(10000016, 'Colegio Newton', 'Calle Los Pinos 101', 'tesoreria@newton.edu.pe', '911111116'),
+(10000017, 'Julio Cesar Dominguez', 'Av. Arequipa 2300', 'jdominguez@correo.com', '911111117'),
+(10000018, 'Transportes Rapidos EIRL', 'Zona Industrial Lote 5', 'operaciones@trapidos.com', '911111118'),
+(10000019, 'Sofía Vergara', 'Urb. San Borja Sur 44', 'svergara@correo.com', '911111119'),
+(10000020, 'Consultora Financiera ABC', 'Centro Empresarial Torre 2', 'contacto@finabc.com', '911111120'),
+(10000021, 'Libreria Estudiantil', 'Av. Universitaria 500', 'ventas@libreriaest.com', '911111121'),
+(10000022, 'Gimnasio FitLife', 'Av. Sucre 780', 'admin@fitlife.pe', '911111122'),
+(10000023, 'Hector Lujan', 'Calle Independencia 102', 'hlujan@correo.com', '911111123'),
+(10000024, 'Carmen Rosa Silva', 'Jr. de la Union 400', 'csilva@correo.com', '911111124'),
+(10000025, 'Supermercados del Norte', 'Panamericana Norte Km 15', 'proveedores@supernorte.com', '911111125'),
+(10000026, 'Tecnologia Aplicada SAC', 'Av. Brasil 1200', 'compras@tecap.pe', '911111126'),
+(10000027, 'Martin Vizcarra', 'Calle Los Jazmines 33', 'mvizcarra@correo.com', '911111127'),
+(10000028, 'Farmacias Unidas', 'Av. Tacna 505', 'almacen@farmaciasu.com', '911111128'),
+(10000029, 'Estudio Juridico P&A', 'Plaza Mayor 110', 'recepcion@estudiopa.com', '911111129'),
+(10000030, 'Luciana Fuster', 'Malecón Cisneros 900', 'lfuster@correo.com', '911111130');
+GO
+
+-- =====================================================================
+-- 2. MÁS PROVEEDORES (Nuevos RUCs)
+-- =====================================================================
+INSERT INTO Proveedor (RUC, RazonSocial, Contacto, Direccion, NumeroContacto, CorreoContacto) VALUES 
+('20600000006', 'Muebles de Oficina Premium', 'Luis Cordova', 'Villa El Salvador Sector 2', '960600600', 'ventas@mueblespremium.pe'),
+('20700000007', 'Papelera Nacional SA', 'Teresa Castro', 'Carretera Central Km 10', '970700700', 'distribucion@papelera.com'),
+('20800000008', 'Iluminacion y Redes SAC', 'Pedro Pablo K.', 'Av. Argentina 800', '980800800', 'ventas@ilumiredes.com'),
+('20900000009', 'Suministros de Limpieza Industrial', 'Ana Maria Polo', 'Callao Mz 4', '990900900', 'pedidos@limpiezaind.com');
+GO
+
+-- =====================================================================
+-- 3. MÁS PRODUCTOS (Autoincrementables: Se les asignará 100020 al 100039)
+-- =====================================================================
+INSERT INTO Producto (Descripcion, PrecioVentaBase, PrecioCompra, Stock) VALUES 
+('Escritorio en L Madera/Metal', 850.00, 550.00, 15),
+('Archivador de Metal 4 Gavetas', 420.00, 280.00, 20),
+('Mesa de Reuniones 6 Personas', 1200.00, 800.00, 5),
+('Pizarra Acrilica 120x90cm', 150.00, 90.00, 40),
+('Caja de Papel A4 (10 Millares)', 140.00, 105.00, 100),
+('Toner Compatible Brother TN-1060', 45.00, 25.00, 80),
+('Toner Original HP 85A', 280.00, 210.00, 30),
+('Cable de Red Cat6 (Caja 305m)', 350.00, 240.00, 10),
+('Router Inalambrico Dual Band', 180.00, 110.00, 50),
+('Switch de Red 24 Puertos Gigabit', 450.00, 320.00, 15),
+('Camara de Seguridad IP Domo', 120.00, 80.00, 60),
+('DVR 8 Canales 1080p', 350.00, 250.00, 25),
+('Disco Duro para Servidor 4TB', 650.00, 480.00, 20),
+('UPS Respaldo de Energia 1000VA', 280.00, 190.00, 45),
+('Proyector Multimedia 3500 Lúmenes', 1600.00, 1100.00, 12),
+('Teléfono IP para Oficina', 190.00, 130.00, 70),
+('Pack de Boligrafos (Caja x50)', 25.00, 12.00, 200),
+('Cuadernos Institucionales x100', 450.00, 300.00, 30),
+('Galonera Alcohol Isopropilico', 55.00, 35.00, 60),
+('Kit Limpieza de Pantallas', 20.00, 10.00, 150);
+GO
+
+-- =====================================================================
+-- 4. MÁS ÓRDENES DE COMPRA (Códigos manuales del 300005 al 300012)
+-- =====================================================================
+INSERT INTO OrdenCompra (Codigo, Proveedor_RUC, FechaIngreso, Estado) VALUES 
+(300005, '20600000006', '2026-06-15', 'Procesada'),
+(300006, '20700000007', '2026-06-18', 'Procesada'),
+(300007, '20800000008', '2026-06-20', 'Pendiente'),
+(300008, '20900000009', '2026-06-22', 'Procesada'),
+(300009, '20100000001', '2026-06-25', 'Solicitada'),
+(300010, '20200000002', '2026-06-26', 'Procesada'),
+(300011, '20600000006', '2026-07-01', 'Pendiente'),
+(300012, '20700000007', '2026-07-02', 'Procesada');
+GO
+
+-- =====================================================================
+-- 5. DETALLES DE LAS COMPRAS (Lotes que alimentan el stock)
+-- =====================================================================
+INSERT INTO LoteProducto (OrdenCompra_Codigo, Producto_ID, CantidadIngresada, PrecioCompraIndividual) VALUES 
+(300005, 100020, 15, 550.00), -- 15 Escritorios
+(300005, 100021, 20, 280.00), -- 20 Archivadores
+(300006, 100024, 100, 105.00),-- 100 Cajas de Papel A4
+(300006, 100036, 200, 12.00), -- 200 Cajas de Boligrafos
+(300008, 100038, 60, 35.00),  -- 60 Alcohol Isopropilico
+(300008, 100039, 150, 10.00), -- 150 Kits de limpieza
+(300010, 100028, 50, 110.00), -- 50 Routers
+(300010, 100029, 15, 320.00), -- 15 Switches
+(300012, 100025, 80, 25.00),  -- 80 Toners Brother
+(300012, 100026, 30, 210.00); -- 30 Toners HP
+GO
+
+-- =====================================================================
+-- 6. MÁS PEDIDOS (Autoincrementables: Se les asignará 200010 al 200025)
+-- =====================================================================
+INSERT INTO Pedido (Cliente_ID, FechaEmision, FechaRecepcion, Estado, TipoVenta, FechaLimitePago, DeudaPendiente) VALUES 
+(10000011, '2026-07-01', '2026-07-02', 'Entregado', 'Credito', '2026-08-01', 3400.00),
+(10000012, '2026-07-01', '2026-07-01', 'Entregado', 'Contado', '2026-07-01', 0.00),
+(10000013, '2026-07-02', NULL, 'Pendiente', 'Contado', '2026-07-02', 450.00),
+(10000014, '2026-07-02', '2026-07-02', 'Entregado', 'Credito', '2026-07-15', 180.00),
+(10000015, '2026-07-03', NULL, 'Activo', 'Contado', '2026-07-03', 1200.00),
+(10000016, '2026-07-03', '2026-07-03', 'Entregado', 'Contado', '2026-07-03', 0.00),
+(10000017, '2026-07-04', NULL, 'Pendiente', 'Credito', '2026-08-04', 850.00),
+(10000018, '2026-07-04', NULL, 'Activo', 'Contado', '2026-07-04', 560.00),
+(10000019, '2026-07-05', '2026-07-05', 'Entregado', 'Contado', '2026-07-05', 0.00),
+(10000020, '2026-07-05', '2026-07-06', 'Entregado', 'Credito', '2026-09-05', 4800.00),
+(10000021, '2026-07-06', NULL, 'Pendiente', 'Contado', '2026-07-06', 700.00),
+(10000022, '2026-07-06', '2026-07-06', 'Entregado', 'Contado', '2026-07-06', 0.00),
+(10000023, '2026-07-07', NULL, 'Activo', 'Credito', '2026-07-21', 140.00),
+(10000024, '2026-07-07', NULL, 'Pendiente', 'Contado', '2026-07-07', 25.00),
+(10000025, '2026-07-08', '2026-07-08', 'Entregado', 'Contado', '2026-07-08', 0.00),
+(10000026, '2026-07-08', NULL, 'Activo', 'Credito', '2026-08-08', 2100.00);
+GO
+
+-- =====================================================================
+-- 7. DETALLES DE LOS NUEVOS PEDIDOS
+-- =====================================================================
+INSERT INTO DetallePedido (Pedido_Codigo, Producto_ID, CantidadVendida, PrecioVentaCongelado) VALUES 
+(200010, 100020, 4, 850.00),  -- Pedido 10: 4 Escritorios (Total 3400)
+(200011, 100024, 10, 140.00), -- Pedido 11: 10 Cajas Papel
+(200011, 100036, 10, 25.00),  -- Pedido 11: 10 Cajas Boligrafos (Total pagado 1650)
+(200012, 100029, 1, 450.00),  -- Pedido 12: 1 Switch Red
+(200013, 100028, 1, 180.00),  -- Pedido 13: 1 Router
+(200014, 100030, 10, 120.00), -- Pedido 14: 10 Camaras IP
+(200015, 100034, 1, 1600.00), -- Pedido 15: 1 Proyector (Total pagado 1600)
+(200016, 100020, 1, 850.00),  -- Pedido 16: 1 Escritorio
+(200017, 100033, 2, 280.00),  -- Pedido 17: 2 UPS
+(200018, 100039, 5, 20.00),   -- Pedido 18: 5 Kits Limpieza (Total pagado 100)
+(200019, 100022, 4, 1200.00), -- Pedido 19: 4 Mesas Reuniones (Total 4800)
+(200020, 100024, 5, 140.00),  -- Pedido 20: 5 Cajas Papel
+(200021, 100023, 4, 150.00),  -- Pedido 21: 4 Pizarras (Total pagado 600)
+(200022, 100024, 1, 140.00),  -- Pedido 22: 1 Caja Papel
+(200023, 100036, 1, 25.00),   -- Pedido 23: 1 Caja Boligrafos
+(200024, 100025, 2, 45.00),   -- Pedido 24: 2 Toners Brother (Total pagado 90)
+(200025, 100026, 5, 280.00),  -- Pedido 25: 5 Toners HP
+(200025, 100021, 5, 140.00);  -- Pedido 25: 5 Archivadores (Total 2100)
+GO
+
+-- =====================================================================
+-- 8. RECIBOS DE PAGOS / ABONOS 
+-- Justifican a los nuevos pedidos que tienen DeudaPendiente en 0.00
+-- =====================================================================
+INSERT INTO PagoAbono (Pedido_Codigo, FechaAbono, MontoAbonado) VALUES 
+(200011, '2026-07-01', 1650.00), 
+(200015, '2026-07-03', 1600.00), 
+(200018, '2026-07-05', 100.00),  
+(200021, '2026-07-06', 600.00),  
+(200024, '2026-07-08', 90.00),
+(200010, '2026-07-08', 1000.00); -- Un cliente de credito abonó una parte
+GO
+
+-- =====================================================================
+-- 9. HISTORIAL KARDEX (Algunos movimientos de los productos nuevos)
+-- =====================================================================
+INSERT INTO MovimientosKardex (Producto_ID, FechaMovimiento, TipoMovimiento, CantidadFisica, ValorUnitario, SaldoCantidadActual, SaldoCostoPromedio) VALUES 
+(100020, '2026-06-15', 'entrada', 15, 550.00, 15, 550.00),
+(100024, '2026-06-18', 'entrada', 100, 105.00, 100, 105.00),
+(100024, '2026-07-01', 'salida', 10, 140.00, 90, 105.00),
+(100020, '2026-07-01', 'salida', 4, 850.00, 11, 550.00),
+(100024, '2026-07-06', 'salida', 5, 140.00, 85, 105.00);
+GO

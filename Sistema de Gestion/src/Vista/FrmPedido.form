@@ -56,10 +56,10 @@
                               <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtProductoSeleccionado" alignment="0" min="-2" pref="171" max="-2" attributes="0"/>
-                              <Component id="txtClienteSeleccionado" alignment="0" min="-2" pref="171" max="-2" attributes="0"/>
-                              <Component id="txtFechaRecepcion" alignment="0" min="-2" pref="171" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="txtProductoSeleccionado" alignment="0" pref="171" max="32767" attributes="0"/>
+                              <Component id="txtClienteSeleccionado" alignment="0" pref="171" max="32767" attributes="0"/>
+                              <Component id="jdFechaRecepcion" alignment="0" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" pref="40" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
@@ -82,10 +82,7 @@
                                   <EmptySpace min="53" max="32767" attributes="0"/>
                                   <Component id="btnAgregarAlCarrito" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Group type="102" attributes="0">
-                                  <Component id="txtFechaLimitePago" min="-2" pref="160" max="-2" attributes="0"/>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                              </Group>
+                              <Component id="jdFechaLimitePago" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -132,15 +129,13 @@
                   </Group>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jLabel6" alignment="3" min="-2" pref="24" max="-2" attributes="0"/>
-                      <Component id="txtFechaRecepcion" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="jLabel6" min="-2" pref="24" max="-2" attributes="0"/>
+                      <Component id="jLabel7" alignment="0" min="-2" pref="24" max="-2" attributes="0"/>
+                      <Component id="jdFechaLimitePago" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Group type="103" alignment="0" groupAlignment="3" attributes="0">
-                      <Component id="jLabel7" alignment="3" min="-2" pref="24" max="-2" attributes="0"/>
-                      <Component id="txtFechaLimitePago" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
+                  <Component id="jdFechaRecepcion" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace pref="22" max="32767" attributes="0"/>
               <Component id="jScrollPane1" min="-2" pref="233" max="-2" attributes="0"/>
@@ -280,14 +275,10 @@
         <Property name="text" type="java.lang.String" value="Fecha de Entrega"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="txtFechaRecepcion">
-    </Component>
     <Component class="javax.swing.JLabel" name="jLabel7">
       <Properties>
         <Property name="text" type="java.lang.String" value="Fecha Limite de pago"/>
       </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="txtFechaLimitePago">
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel8">
       <Properties>
@@ -309,6 +300,10 @@
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
       </AuxValues>
+    </Component>
+    <Component class="com.toedter.calendar.JDateChooser" name="jdFechaRecepcion">
+    </Component>
+    <Component class="com.toedter.calendar.JDateChooser" name="jdFechaLimitePago">
     </Component>
   </SubComponents>
 </Form>

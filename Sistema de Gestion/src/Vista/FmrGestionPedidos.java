@@ -21,44 +21,50 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
      * Creates new form FmrGestionPedidos
      */
     public FmrGestionPedidos(GestorVentas gestor) {
-        initComponents();
+       initComponents();
+        
+      
+        
         this.gestorVentas = gestor;
         
         // Apagamos los botones de acción hasta que seleccionen una fila
         btnProcesar.setEnabled(false);
         btnCancelar.setEnabled(false);
-        btnCancelar.setEnabled(false); // Nuevo botón para ventas
         
         actualizarTabla();
     }
     private void actualizarTabla() {
-        javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) tblPedidos.getModel();
-        modelo.setRowCount(0); 
+    javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) tblPedidos.getModel();
+    modelo.setRowCount(0); 
 
-        // Traemos el historial de ventas
-        java.util.List<Pedido> lista = gestorVentas.obtenerHistorialPedidos();
+    // Traemos el historial (Solo cabeceras, sin productos)
+    java.util.List<Entidades.Pedido> lista = gestorVentas.obtenerHistorialPedidos();
+    
+    for (Entidades.Pedido p : lista) {
         
-        for (Pedido p : lista) {
-            double montoTotal = 0;
-            // En ventas se usan Detalles de Pedido, no Lotes
-            for (DetallePedido detalle : p.getDetalles()) {
-                montoTotal += detalle.getCantidadVendida() * detalle.getPrecioVentaCongelado();
-            }
-            
-            // Ordenamos: Fecha, Codigo, Cliente, Monto Total, Estado
-           modelo.addRow(new Object[]{
-                p.getCodigo(), 
-                p.getCliente().getNombre(), 
-                p.getFechaEmision(),
-                p.getFechaRecepcion(),
-                String.format("S/ %.2f", montoTotal),
-                p.getEstado(),
-                p.getTipoVenta(),
-                String.format("S/ %.2f", p.getDeudaPendiente()) // Usamos la deuda en lugar de FechaPago
-            });
-        }
+        // Le pedimos al Gestor que vaya a la BD y llene la lista de productos de este pedido
+        Entidades.Pedido pedidoCompleto = gestorVentas.obtenerDetallesDePedido(p.getCodigo());
+        
+        // Delegamos la operación matemática a la Entidad.
+        double montoTotal = (pedidoCompleto != null) ? pedidoCompleto.getTotalPedido() : 0.0;
+        
+        // ORDEN EXACTO PARA TUS COLUMNAS:
+        // [0]Codigo, [1]Cliente, [2]Emision, [3]Recepcion, [4]Total, [5]Estado, [6]Tipo, [7]FechaPago, [8]Deuda
+        modelo.addRow(new Object[]{
+            p.getCodigo(), 
+            p.getCliente().getNombre(), 
+            p.getFechaEmision(),
+            p.getFechaRecepcion(),
+            String.format("S/ %.2f", montoTotal), // Total (Columna 4)
+            p.getEstado(),
+            p.getTipoVenta(),
+            p.getFechaLimitePago(),               // FechaPago (Columna 7)
+            String.format("S/ %.2f", p.getDeudaPendiente()) // Deuda (Columna 8)
+        });
     }
-
+    
+    ajustarAnchoColumnas();
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -79,17 +85,17 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
 
         tblPedidos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Codigo", "Cliente", "Emision", "Recepcion", "Total", "Estado", "Tipo Venta", "FechaPago"
+                "Codigo", "Cliente", "Emision", "Recepcion", "Total", "Estado", "Tipo Venta", "FechaPago", "Deuda"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -115,6 +121,7 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
             tblPedidos.getColumnModel().getColumn(5).setResizable(false);
             tblPedidos.getColumnModel().getColumn(6).setResizable(false);
             tblPedidos.getColumnModel().getColumn(7).setResizable(false);
+            tblPedidos.getColumnModel().getColumn(8).setResizable(false);
         }
 
         btnRegresar.setText("Regresar");

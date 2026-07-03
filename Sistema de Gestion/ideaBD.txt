@@ -24,7 +24,7 @@ CREATE TABLE Proveedor (
 GO
 
 CREATE TABLE Producto (
-    ID INT PRIMARY KEY,
+    ID INT PRIMARY KEY IDENTITY(100000, 1),
     Descripcion VARCHAR(150) NOT NULL,
     PrecioVentaBase DECIMAL(10, 2),
     PrecioCompra DECIMAL(10, 2),
@@ -35,7 +35,7 @@ GO
 
 
 CREATE TABLE Pedido (
-    Codigo INT PRIMARY KEY,
+    Codigo INT PRIMARY KEY IDENTITY(200000, 1),
     Cliente_ID INT NOT NULL REFERENCES Cliente(ID),
     FechaEmision DATE NOT NULL,
     FechaRecepcion DATE,
@@ -76,7 +76,7 @@ GO
 
 
 CREATE TABLE PagoAbono (
-    CodigoRecibo INT PRIMARY KEY,
+    CodigoRecibo INT PRIMARY KEY IDENTITY(400000, 1),
     Pedido_Codigo INT NOT NULL REFERENCES Pedido(Codigo),
     FechaAbono DATE NOT NULL,
     MontoAbonado DECIMAL(10, 2) NOT NULL
@@ -84,7 +84,7 @@ CREATE TABLE PagoAbono (
 GO
 
 CREATE TABLE MovimientosKardex (
-    IdMovimiento INT PRIMARY KEY,
+    IdMovimiento INT PRIMARY KEY IDENTITY(100000, 1),
     Producto_ID INT NOT NULL REFERENCES Producto(ID),
     FechaMovimiento DATE NOT NULL,
     TipoMovimiento VARCHAR(20) NOT NULL,

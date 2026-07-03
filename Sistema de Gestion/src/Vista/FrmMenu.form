@@ -38,6 +38,14 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jmiGestionarPedidosActionPerformed"/>
                   </Events>
                 </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="jmiCuentasDeudas">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Cuentas por Cobrar"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jmiCuentasDeudasActionPerformed"/>
+                  </Events>
+                </MenuItem>
               </SubComponents>
             </Menu>
             <MenuItem class="javax.swing.JMenuItem" name="jmiProductos">
@@ -84,13 +92,76 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <EmptySpace min="0" pref="252" max="32767" attributes="0"/>
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="lblVentasHoy1" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblVentasHoy" alignment="0" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="lblDeudas1" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblDeudas" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace pref="59" max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="lblPendientes1" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblPendientes" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
+          </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <EmptySpace min="0" pref="157" max="32767" attributes="0"/>
+          <Group type="102" alignment="1" attributes="0">
+              <EmptySpace min="-2" pref="21" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="lblVentasHoy1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblDeudas1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblPendientes1" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="lblVentasHoy" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblDeudas" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblPendientes" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace pref="26" max="32767" attributes="0"/>
+          </Group>
       </Group>
     </DimensionLayout>
   </Layout>
+  <SubComponents>
+    <Component class="javax.swing.JLabel" name="lblVentasHoy">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Hoy"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblDeudas">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Deudas"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblPendientes">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Pendiente"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblVentasHoy1">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Ventas Hoy"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblDeudas1">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Deudas"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblPendientes1">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Pendientes"/>
+      </Properties>
+    </Component>
+  </SubComponents>
 </Form>

@@ -12,14 +12,14 @@ import java.time.format.DateTimeParseException;
  * @author equipo
  */
 public class PagoAbono {
-    private static int contadorGlobal = 400000;
+    
     private int codigoRecibo;
     private String fechaAbono;
     private double montoAbonado;
     private Pedido pedido;
     
    public PagoAbono( String fechaAbono, double montoAbonado, Pedido pedido) {
-        codigoRecibo=contadorGlobal++;
+        
         setFechaAbono(fechaAbono);
         setMontoAbonado(montoAbonado);
         setPedido(pedido);
@@ -33,6 +33,10 @@ public class PagoAbono {
 
     public String getFechaAbono() {
         return fechaAbono;
+    }
+    // NUEVO: Método para que el DAO inyecte el ID generado por SQL Server
+    public void setCodigoRecibo(int codigoRecibo) {
+        this.codigoRecibo = codigoRecibo;
     }
 
     public void setFechaAbono(String fechaAbono) {

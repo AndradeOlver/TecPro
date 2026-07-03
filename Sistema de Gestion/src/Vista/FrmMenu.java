@@ -25,6 +25,42 @@ public class FrmMenu extends javax.swing.JFrame {
      */
     public FrmMenu() {
         initComponents();
+        this.setTitle("Menú Principal");
+        
+        // Ejecutamos el cálculo al iniciar el menú
+        actualizarDashboard();
+    }
+    public void actualizarDashboard() {
+        double ventasHoy = 0.0;
+        double deudasTotales = 0.0;
+        int pedidosPendientes = 0;
+        String fechaHoy = java.time.LocalDate.now().toString();
+
+        // Validamos que el gestor exista para evitar errores al iniciar
+        if (this.gestorVentas != null) {
+            for (Entidades.Pedido p : gestorVentas.obtenerHistorialPedidos()) {
+                
+                // 1. Sumar todas las deudas pendientes
+                deudasTotales += p.getDeudaPendiente();
+
+                // 2. Contar pedidos que aún no se entregan
+                if (p.getEstado().equalsIgnoreCase("Pendiente") || p.getEstado().equalsIgnoreCase("Activo")) {
+                    pedidosPendientes++;
+                }
+
+                // 3. Calcular ingresos netos solo del día de hoy
+                if (p.getFechaEmision().equals(fechaHoy)) {
+                    for (Entidades.DetallePedido dp : p.getDetalles()) {
+                        ventasHoy += (dp.getCantidadVendida() * dp.getPrecioVentaCongelado());
+                    }
+                }
+            }
+        }
+
+        // Mostrar los resultados en las etiquetas del menú
+        lblVentasHoy.setText(String.format("S/ %.2f", ventasHoy));
+        lblDeudas.setText(String.format("S/ %.2f", deudasTotales));
+        lblPendientes.setText(String.valueOf(pedidosPendientes));
     }
 
     /**
@@ -36,16 +72,35 @@ public class FrmMenu extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        lblVentasHoy = new javax.swing.JLabel();
+        lblDeudas = new javax.swing.JLabel();
+        lblPendientes = new javax.swing.JLabel();
+        lblVentasHoy1 = new javax.swing.JLabel();
+        lblDeudas1 = new javax.swing.JLabel();
+        lblPendientes1 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jmnAreaVentas = new javax.swing.JMenu();
         jmiGestionarClientes = new javax.swing.JMenuItem();
         jmiGenerarPedido = new javax.swing.JMenuItem();
         jmiGestionarPedidos = new javax.swing.JMenuItem();
+        jmiCuentasDeudas = new javax.swing.JMenuItem();
         jmiProductos = new javax.swing.JMenuItem();
         jmiProveedores = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        lblVentasHoy.setText("Hoy");
+
+        lblDeudas.setText("Deudas");
+
+        lblPendientes.setText("Pendiente");
+
+        lblVentasHoy1.setText("Ventas Hoy");
+
+        lblDeudas1.setText("Deudas");
+
+        lblPendientes1.setText("Pendientes");
 
         jMenu1.setText("Menu");
 
@@ -62,6 +117,10 @@ public class FrmMenu extends javax.swing.JFrame {
         jmiGestionarPedidos.setText("Gestionar Pedidos");
         jmiGestionarPedidos.addActionListener(this::jmiGestionarPedidosActionPerformed);
         jmnAreaVentas.add(jmiGestionarPedidos);
+
+        jmiCuentasDeudas.setText("Cuentas por Cobrar");
+        jmiCuentasDeudas.addActionListener(this::jmiCuentasDeudasActionPerformed);
+        jmnAreaVentas.add(jmiCuentasDeudas);
 
         jMenu1.add(jmnAreaVentas);
 
@@ -81,11 +140,35 @@ public class FrmMenu extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 252, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(26, 26, 26)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblVentasHoy1)
+                    .addComponent(lblVentasHoy))
+                .addGap(28, 28, 28)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lblDeudas1)
+                    .addComponent(lblDeudas))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 59, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblPendientes1)
+                    .addComponent(lblPendientes))
+                .addGap(29, 29, 29))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 157, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(21, 21, 21)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblVentasHoy1)
+                    .addComponent(lblDeudas1)
+                    .addComponent(lblPendientes1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblVentasHoy)
+                    .addComponent(lblDeudas)
+                    .addComponent(lblPendientes))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
 
         pack();
@@ -126,6 +209,13 @@ public class FrmMenu extends javax.swing.JFrame {
         this.setVisible(false);
     }//GEN-LAST:event_jmiGestionarClientesActionPerformed
 
+    private void jmiCuentasDeudasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmiCuentasDeudasActionPerformed
+        Vista.FrmReporteDeudores reporte = new Vista.FrmReporteDeudores(this.gestorVentas);
+        reporte.setLocationRelativeTo(null); 
+        reporte.setVisible(true);            
+        this.dispose();
+    }//GEN-LAST:event_jmiCuentasDeudasActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -154,11 +244,18 @@ public class FrmMenu extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jmiCuentasDeudas;
     private javax.swing.JMenuItem jmiGenerarPedido;
     private javax.swing.JMenuItem jmiGestionarClientes;
     private javax.swing.JMenuItem jmiGestionarPedidos;
     private javax.swing.JMenuItem jmiProductos;
     private javax.swing.JMenuItem jmiProveedores;
     private javax.swing.JMenu jmnAreaVentas;
+    private javax.swing.JLabel lblDeudas;
+    private javax.swing.JLabel lblDeudas1;
+    private javax.swing.JLabel lblPendientes;
+    private javax.swing.JLabel lblPendientes1;
+    private javax.swing.JLabel lblVentasHoy;
+    private javax.swing.JLabel lblVentasHoy1;
     // End of variables declaration//GEN-END:variables
 }

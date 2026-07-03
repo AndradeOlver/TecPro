@@ -11,7 +11,7 @@ import java.util.Objects;
  * @author equipo
  */
 public class DetallePedido {
-    private static int contadorGlobal = 500000;
+    
     private int codigo;
     private int cantidadVendida;
     private double precioVentaCongelado;
@@ -20,10 +20,10 @@ public class DetallePedido {
     
     public DetallePedido(int cantidadVendida, double precioVentaCongelado, Producto producto) {
         
-        this.codigo = contadorGlobal++;
         
+        
+        this.codigo = 0; // Se actualizará al guardar en la BD
         setCantidadVendida(cantidadVendida);
-        
         setProducto(producto);
         if (producto != null && producto.getPrecioCompra() != null) {
             if (precioVentaCongelado <= producto.getPrecioCompra()) {
@@ -38,6 +38,13 @@ public class DetallePedido {
         } else {
             throw new IllegalArgumentException("Error: El precio de venta congelado no puede ser negativo.");
         }
+    }
+    // CONSTRUCTOR 2: Para cuando el DAO lee el historial desde la BD
+    public DetallePedido(int codigoBD, int cantidadVendida, double precioVentaCongelado, Producto producto) {
+        this.codigo = codigoBD; 
+        setCantidadVendida(cantidadVendida);
+        this.precioVentaCongelado = precioVentaCongelado;
+        setProducto(producto);
     }
     public int getCodigo() { return codigo; }
     

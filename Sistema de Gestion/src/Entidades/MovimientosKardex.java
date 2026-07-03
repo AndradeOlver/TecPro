@@ -12,7 +12,7 @@ import java.time.format.DateTimeParseException;
  * @author equipo
  */
 public class MovimientosKardex {
-    private static int contadorGlobal = 100000;
+    
     private int idMovimiento;
     private String fechaMovimiento;
     private String tipoMovimiento;
@@ -23,7 +23,7 @@ public class MovimientosKardex {
     private Producto producto;
     
     public MovimientosKardex(String fechaMovimiento, String tipoMovimiento, int cantidadFisica, double valorUnitario, int saldoCantidadActual, double saldoCostoPromedio, Producto producto) {
-        this.idMovimiento = contadorGlobal++;
+        
         setFechaMovimiento(fechaMovimiento);
         setTipoMovimiento(tipoMovimiento);
         setCantidadFisica(cantidadFisica);
@@ -130,6 +130,9 @@ public class MovimientosKardex {
         } else {
             throw new IllegalArgumentException("Error: El movimiento de Kardex debe estar asociado a un producto válido (no nulo).");
         }
+    }
+    public void setIdMovimiento(int idMovimiento) {
+        this.idMovimiento = idMovimiento;
     }
     
 

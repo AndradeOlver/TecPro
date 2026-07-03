@@ -14,7 +14,7 @@ import java.util.ArrayList;
  * @author equipo
  */
 public class Pedido {
-    private static int contadorGlobal = 200000;
+    
     private int codigo;
     private String fechaEmision;
     private String fechaRecepcion;
@@ -27,7 +27,7 @@ public class Pedido {
     private List<PagoAbono> abonos;
 
     public Pedido( String fechaEmision, String fechaRecepcion, String estado, String tipoVenta, String fechaLimitePago, double deudaPendiente,Cliente cliente) {
-       this.codigo = contadorGlobal++;
+       
        this.deudaPendiente = 0.0;
        this.fechaEmision = fechaEmision;
        setFechaRecepcion(fechaRecepcion);
@@ -141,6 +141,9 @@ public class Pedido {
     public List<DetallePedido> getDetalles() {
     return this.detallesVenta;
 }
+    public void setCodigo(int codigo) {
+    this.codigo = codigo;
+}
     
    
     
@@ -226,6 +229,16 @@ public class Pedido {
             System.err.println("Error lógico: El formato de la fecha es inválido.");
             return false;
         }
+    }
+    // NUEVO MÉTODO: Calcula el total bruto del pedido sumando sus detalles
+    public double getTotalPedido() {
+        double total = 0.0;
+        if (this.detallesVenta != null) {
+            for (DetallePedido detalle : this.detallesVenta) {
+                total += (detalle.getCantidadVendida() * detalle.getPrecioVentaCongelado());
+            }
+        }
+        return total;
     }
 
     

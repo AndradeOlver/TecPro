@@ -78,11 +78,11 @@ public class FrmPedido extends javax.swing.JFrame {
         btnProcesarCompra = new javax.swing.JButton();
         btnRegresar = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
-        txtFechaRecepcion = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
-        txtFechaLimitePago = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
         cmbTipoVenta = new javax.swing.JComboBox<>();
+        jdFechaRecepcion = new com.toedter.calendar.JDateChooser();
+        jdFechaLimitePago = new com.toedter.calendar.JDateChooser();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -175,10 +175,10 @@ public class FrmPedido extends javax.swing.JFrame {
                                         .addComponent(btnBuscarProducto, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                                 .addComponent(jLabel6))
                             .addGap(18, 18, 18)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(txtProductoSeleccionado, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(txtClienteSeleccionado, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(txtFechaRecepcion, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(txtProductoSeleccionado, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
+                                .addComponent(txtClienteSeleccionado, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
+                                .addComponent(jdFechaRecepcion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGap(40, 40, 40)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -195,9 +195,7 @@ public class FrmPedido extends javax.swing.JFrame {
                                         .addComponent(txtPrecioVenta, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(btnAgregarAlCarrito))
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(txtFechaLimitePago, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGap(0, 0, Short.MAX_VALUE))))))
+                                .addComponent(jdFechaLimitePago, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
                 .addGap(56, 56, 56))
         );
         layout.setVerticalGroup(
@@ -229,13 +227,12 @@ public class FrmPedido extends javax.swing.JFrame {
                         .addGap(74, 74, 74)
                         .addComponent(btnAgregarAlCarrito, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(txtFechaRecepcion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(txtFechaLimitePago, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jdFechaLimitePago, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jdFechaRecepcion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
@@ -346,9 +343,31 @@ public class FrmPedido extends javax.swing.JFrame {
         String tipoVenta = cmbTipoVenta.getSelectedItem().toString(); 
         String fechaEmision = java.time.LocalDate.now().toString();
         
-        // Fechas ingresadas manualmente
-        String fechaRecepcion = txtFechaRecepcion.getText().trim();
-        String fechaLimitePago = txtFechaLimitePago.getText().trim();
+        // Traductor de fechas del Calendario visual a Texto para tu Base de Datos
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+        
+        // Extraer Fecha de Recepción obligatoria
+        String fechaRecepcion = "";
+        if (jdFechaRecepcion.getDate() != null) {
+            fechaRecepcion = sdf.format(jdFechaRecepcion.getDate());
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this, "Por favor, seleccione una fecha de entrega en el calendario.");
+            return;
+        }
+
+        // Extraer Fecha Límite de Pago
+        String fechaLimitePago = "";
+        if (tipoVenta.equals("Credito")) {
+            if (jdFechaLimitePago.getDate() != null) {
+                fechaLimitePago = sdf.format(jdFechaLimitePago.getDate());
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this, "Para ventas a crédito, debe seleccionar una fecha límite de pago.");
+                return;
+            }
+        } else {
+            // Si es al contado, forzamos la fecha de hoy
+            fechaLimitePago = fechaEmision; 
+        }
 
         // 2. Lógica Financiera: Contado vs Crédito
         double deudaInicial = 0.0;
@@ -400,16 +419,16 @@ public class FrmPedido extends javax.swing.JFrame {
     }//GEN-LAST:event_btnRegresarActionPerformed
 
     private void cmbTipoVentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbTipoVentaActionPerformed
-        String tipo = cmbTipoVenta.getSelectedItem().toString();
+      String tipo = cmbTipoVenta.getSelectedItem().toString();
     
     if (tipo.equals("Contado")) {
-        // Bloqueamos la caja y autocompletamos con la fecha de hoy
-        txtFechaLimitePago.setEnabled(false);
-        txtFechaLimitePago.setText(java.time.LocalDate.now().toString()); 
+        // Bloqueamos el calendario y autocompletamos con la fecha actual
+        jdFechaLimitePago.setEnabled(false);
+        jdFechaLimitePago.setDate(new java.util.Date()); 
     } else {
-        // Si es crédito, liberamos la caja para que el usuario escriba la fecha acordada
-        txtFechaLimitePago.setEnabled(true);
-        txtFechaLimitePago.setText(""); 
+        // Si es crédito, liberamos el calendario y lo dejamos en blanco para que el usuario elija
+        jdFechaLimitePago.setEnabled(true);
+        jdFechaLimitePago.setDate(null); 
     }
     }//GEN-LAST:event_cmbTipoVentaActionPerformed
       private void actualizarTablaCarrito() {
@@ -452,10 +471,10 @@ public class FrmPedido extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
+    private com.toedter.calendar.JDateChooser jdFechaLimitePago;
+    private com.toedter.calendar.JDateChooser jdFechaRecepcion;
     private javax.swing.JTextField txtCantidad;
     private javax.swing.JTextField txtClienteSeleccionado;
-    private javax.swing.JTextField txtFechaLimitePago;
-    private javax.swing.JTextField txtFechaRecepcion;
     private javax.swing.JTextField txtPrecioVenta;
     private javax.swing.JTextField txtProductoSeleccionado;
     // End of variables declaration//GEN-END:variables

@@ -126,24 +126,25 @@ public class jdialProcesarVenta extends javax.swing.JDialog {
                 return;
             }
 
-            // 1. Guardamos el pago en la base de datos (Tu código original)
-            gestor.registrarPagoAbono(pedidoActivo.getCodigo(), abono, pedidoActivo.getDeudaPendiente());
-            
-            // 2. LÓGICA DE RECIBO: Usamos tu Entidad PagoAbono para generar el texto
+            // 1. Creamos la entidad del pago en Java PRIMERO
             String fechaHoy = java.time.LocalDate.now().toString();
             Entidades.PagoAbono nuevoPago = new Entidades.PagoAbono(fechaHoy, abono, pedidoActivo);
-            String textoComprobante = nuevoPago.procesarPago(); // Extrae el formato que diseñaste
+            
+            // 2. Se lo enviamos al gestor para que actualice la deuda Y guarde el insert en PagoAbono
+            gestor.registrarPagoAbono(nuevoPago);
 
-            // 3. Abrimos la nueva interfaz y le inyectamos el texto
+            // 3. Generamos el texto del recibo (que ahora ya tendrá el código real de SQL)
+            String textoComprobante = nuevoPago.procesarPago(); 
+
+            // 4. Abrimos el comprobante visual
             jdialRecibo ventanaRecibo = new jdialRecibo(null, true);
             ventanaRecibo.mostrarRecibo(textoComprobante);
             ventanaRecibo.setLocationRelativeTo(this);
             
-            // El sistema se pausa aquí mostrando el recibo hasta que le den a "Cerrar"
             ventanaRecibo.setVisible(true); 
 
             javax.swing.JOptionPane.showMessageDialog(this, "Pago finalizado exitosamente.");
-            this.dispose(); // Destruye la ventana de cobro y vuelve a la tabla principal
+            this.dispose(); 
 
         } catch (Exception ex) {
             javax.swing.JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);

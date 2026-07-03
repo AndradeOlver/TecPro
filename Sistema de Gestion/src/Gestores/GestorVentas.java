@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Gestores;
+import DAO.PagoAbonoDAO;
 import Entidades.PagoAbono;
 import Entidades.Pedido;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class GestorVentas {
     private PedidoDAO pedidoDAO;
     private DetallePedidoDAO detallePedidoDAO;
     private GestorInventario gestorInventario; // Necesario para actualizar el stock
+    private PagoAbonoDAO pagoAbonoDAO;
 
     public GestorVentas() {
         this.pedidoDAO = new PedidoDAO();
@@ -58,27 +60,31 @@ public class GestorVentas {
         }
     }
 
-    public void registrarPagoAbono(int codigoPedido, double montoAbonado, double deudaActual) {
-        if (montoAbonado <= 0) {
+    public void registrarPagoAbono(PagoAbono abono) {
+        if (abono.getMontoAbonado() <= 0) {
             throw new IllegalArgumentException("Error: El monto a abonar debe ser mayor a cero.");
         }
 
-        double nuevaDeuda = deudaActual - montoAbonado;
+        double deudaActual = abono.getPedido().getDeudaPendiente();
+        double nuevaDeuda = deudaActual - abono.getMontoAbonado();
+        
         if (nuevaDeuda < 0) {
             throw new IllegalArgumentException("Error: El abono supera la deuda actual.");
         }
 
-        // Determinamos el nuevo estado basado en si la deuda llegó a 0
         String nuevoEstado = (nuevaDeuda == 0) ? "Entregado" : "Pendiente";
 
-        // Actualizamos la base de datos
-        boolean actualizado = pedidoDAO.actualizarEstadoYDeuda(codigoPedido, nuevoEstado, nuevaDeuda);
-        
-        if (!actualizado) {
-            throw new RuntimeException("Error: No se pudo registrar el abono en la base de datos.");
+        // 1. Actualizamos la Deuda en el Pedido (Como tenías antes)
+        boolean pedidoActualizado = pedidoDAO.actualizarEstadoYDeuda(abono.getPedido().getCodigo(), nuevoEstado, nuevaDeuda);
+        if (!pedidoActualizado) {
+            throw new RuntimeException("Error: No se pudo registrar el abono en el Pedido.");
         }
         
-        // (Nota: Aquí en el futuro puedes agregar la llamada a PagoAbonoDAO para guardar el recibo físico)
+        // 2. NUEVO: Insertamos el registro físico del Abono en su tabla
+        boolean pagoRegistrado = pagoAbonoDAO.registrar(abono);
+        if (!pagoRegistrado) {
+            throw new RuntimeException("Error: No se pudo guardar el comprobante en la tabla PagoAbono.");
+        }
     }
     
     public List<Pedido> obtenerHistorialPedidos() {

@@ -17,18 +17,23 @@ import java.util.List;
  */
 public class MovimientosKardexDAO {
     public boolean registrar(MovimientosKardex mk) {
-        String sql = "INSERT INTO MovimientosKardex (IdMovimiento, Producto_ID, FechaMovimiento, TipoMovimiento, CantidadFisica, ValorUnitario, SaldoCantidadActual, SaldoCostoPromedio) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO MovimientosKardex (Producto_ID, FechaMovimiento, TipoMovimiento, CantidadFisica, ValorUnitario, SaldoCantidadActual, SaldoCostoPromedio) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = ConexionSQL.probarConexion(); 
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, mk.getIdMovimiento());
-            ps.setInt(2, mk.getProducto().getId());
-            ps.setDate(3, java.sql.Date.valueOf(mk.getFechaMovimiento()));
-            ps.setString(4, mk.getTipoMovimiento());
-            ps.setInt(5, mk.getCantidadFisica());
-            ps.setDouble(6, mk.getValorUnitario());
-            ps.setInt(7, mk.getSaldoCantidadActual());
-            ps.setDouble(8, mk.getSaldoCostoPromedio());
+             PreparedStatement ps = con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);) {
+            
+            ps.setInt(1, mk.getProducto().getId());
+            ps.setDate(2, java.sql.Date.valueOf(mk.getFechaMovimiento()));
+            ps.setString(3, mk.getTipoMovimiento());
+            ps.setInt(4, mk.getCantidadFisica());
+            ps.setDouble(5, mk.getValorUnitario());
+            ps.setInt(6, mk.getSaldoCantidadActual());
+            ps.setDouble(7, mk.getSaldoCostoPromedio());
             ps.execute();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+            if (rs.next()) {
+                mk.setIdMovimiento(rs.getInt(1));
+            }
+}
             return true;
         } catch (SQLException e) {
             System.err.println("Error al registrar Kardex: " + e.getMessage());
