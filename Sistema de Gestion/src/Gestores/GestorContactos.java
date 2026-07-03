@@ -112,4 +112,17 @@ public class GestorContactos {
             throw new IllegalArgumentException("Error: No se pudo actualizar el proveedor en la Base de Datos.");
         }
     }
+    public void eliminarCliente(int codigo) {
+    boolean exito = clienteDAO.eliminar(codigo);
+    if (!exito) {
+        throw new RuntimeException("Acción denegada: Este registro no se puede eliminar porque cuenta con transacciones o historial en el sistema.");
+    }
+    
+    }
+    public void eliminarProveedor(String ruc) {
+    boolean exito = proveedorDAO.eliminar(ruc);
+    if (!exito) {
+        throw new RuntimeException("Acción denegada: Este proveedor no se puede eliminar porque cuenta con órdenes de compra o historial asociado en el sistema.");
+    }
+}
 }

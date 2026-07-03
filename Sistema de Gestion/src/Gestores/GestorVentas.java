@@ -129,4 +129,10 @@ public class GestorVentas {
             pedidoDAO.actualizarEstado(codigo, "Cancelado");
         }
     }
+    public void eliminarPedidosCancelados() {
+    boolean exito = pedidoDAO.eliminarCancelados();
+    if (!exito) {
+        throw new RuntimeException("Error crítico: No se pudieron limpiar los pedidos cancelados.");
+    }
+}
 }

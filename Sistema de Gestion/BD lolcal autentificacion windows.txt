@@ -1,58 +1,43 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package DAO;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-/**
- *
- * @author equipo
- */
 public class ConexionSQL {
-    // 1. Los Parámetros de Ruta (Cadena de Conexión)
-    // Reemplaza "NombreDeTuBD", "tu_usuario" y "tu_contraseña" con tus datos reales.
-     private static final String SERVIDOR = "sql5101.site4now.net";
+    // 1. Parámetros de Ruta 
+    private static final String SERVIDOR = "localhost";
     private static final String PUERTO = "1433";
-    private static final String BASE_DATOS = "db_acb22b_proyectoelvia";
-    private static final String USUARIO = "db_acb22b_proyectoelvia_admin";
-    private static final String CLAVE = "Elllara140";
+    private static final String BASE_DATOS = "GESTOR";
     
-    // URL formateada para el driver de Microsoft
+    // 2. Se agrega integratedSecurity=true (Autenticación de Windows)
     private static final String URL = "jdbc:sqlserver://" + SERVIDOR + ":" + PUERTO + 
                                       ";databaseName=" + BASE_DATOS + 
-                                      ";encrypt=true;trustServerCertificate=true;";
+                                      ";integratedSecurity=true;encrypt=true;trustServerCertificate=true;";
 
     public static Connection probarConexion() {
         Connection conexion = null;
         
-        
         try {
-            
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             
+            // 3. Se pasa ÚNICAMENTE la URL (Se eliminan las variables de usuario y clave)
+            conexion = DriverManager.getConnection(URL);
             
-            conexion = DriverManager.getConnection(URL, USUARIO, CLAVE);
-            
-           
             if (conexion != null) {
-                System.out.println("¡Conexión establecida con éxito a SQL Server!");
+                System.out.println("¡Conexión establecida con éxito mediante Autenticación de Windows!");
             }
             
         } catch (ClassNotFoundException e) {
             System.err.println("Error crítico: No se encontró el Driver de SQL Server.");
             System.err.println("Detalle: " + e.getMessage());
         } catch (SQLException e) {
-            System.err.println("Error de conexión: Verifica que el servidor esté encendido y las credenciales sean correctas.");
+            System.err.println("Error de conexión: Verifica configuración o la librería DLL.");
             System.err.println("Detalle: " + e.getMessage());
         }
         
         return conexion;
     }
 
-    // 6. La Limpieza (Método auxiliar para cerrar la conexión cuando termines de usarla)
     public static void cerrarConexion(Connection conexion) {
         if (conexion != null) {
             try {

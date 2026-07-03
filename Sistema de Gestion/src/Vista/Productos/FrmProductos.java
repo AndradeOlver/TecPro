@@ -51,6 +51,7 @@ public class FrmProductos extends javax.swing.JFrame {
         btnAgregarPedido = new javax.swing.JButton();
         btnRegresar = new javax.swing.JButton();
         btnProcesarCompra = new javax.swing.JButton();
+        btnEliminar = new javax.swing.JButton();
 
         jMenuItem1.setText("Tarjeta de Almacen");
         jMenuItem1.addActionListener(this::jMenuItem1ActionPerformed);
@@ -112,6 +113,9 @@ public class FrmProductos extends javax.swing.JFrame {
         btnProcesarCompra.setText("Procesar Compra");
         btnProcesarCompra.addActionListener(this::btnProcesarCompraActionPerformed);
 
+        btnEliminar.setText("Eliminar Productos");
+        btnEliminar.addActionListener(this::btnEliminarActionPerformed);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -123,8 +127,10 @@ public class FrmProductos extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(btnAgregarPedido)
-                                .addGap(186, 186, 186)
+                                .addGap(92, 92, 92)
                                 .addComponent(btnProcesarCompra)
+                                .addGap(92, 92, 92)
+                                .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(btnAgregarProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 884, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -148,7 +154,8 @@ public class FrmProductos extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAgregarProducto)
                     .addComponent(btnAgregarPedido)
-                    .addComponent(btnProcesarCompra))
+                    .addComponent(btnProcesarCompra)
+                    .addComponent(btnEliminar))
                 .addGap(37, 37, 37))
         );
 
@@ -273,6 +280,30 @@ public class FrmProductos extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+        // TODO add your handling code here:
+        int fila = tblProductos.getSelectedRow();
+        if (fila != -1) {
+            int confirmacion = javax.swing.JOptionPane.showConfirmDialog(this, 
+                "¿Está seguro que desea eliminar el producto seleccionado?", 
+                "Confirmar Eliminación", javax.swing.JOptionPane.YES_NO_OPTION);
+                
+            if (confirmacion == javax.swing.JOptionPane.YES_OPTION) {
+                try {
+                    // Extrae el ID de la primera columna (índice 0)
+                    int id = Integer.parseInt(tblProductos.getValueAt(fila, 0).toString());
+                    gestorInventario.eliminarProducto(id);
+                    javax.swing.JOptionPane.showMessageDialog(this, "Producto eliminado correctamente.");
+                    actualizarTabla();
+                } catch (RuntimeException ex) {
+                    javax.swing.JOptionPane.showMessageDialog(this, ex.getMessage(), "Error de Dependencia", javax.swing.JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this, "Seleccione un producto de la tabla primero.", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_btnEliminarActionPerformed
+
     // Nuevo método para recibir el texto de la ventana hija
     public void registrarNuevoProducto(String descripcion) {
          // 1. Aquí debes guardar el producto en tu gestor. 
@@ -352,6 +383,7 @@ public class FrmProductos extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregarPedido;
     private javax.swing.JButton btnAgregarProducto;
+    private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnProcesarCompra;
     private javax.swing.JButton btnRegresar;
     private javax.swing.JLabel jLProductos;

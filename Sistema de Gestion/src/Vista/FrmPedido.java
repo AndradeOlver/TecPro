@@ -285,104 +285,91 @@ public class FrmPedido extends javax.swing.JFrame {
 
     private void btnAgregarAlCarritoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarAlCarritoActionPerformed
         try {
-            if (productoSeleccionadoTemporal == null) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Seleccione un producto.");
-                return;
-            }
-            if (clienteSeleccionadoTemporal == null) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Seleccione un cliente.");
-                return;
-            }
-
-            String textoCantidad = txtCantidad.getText().trim();
-            String textoPrecio = txtPrecioVenta.getText().trim().replace(",", ".");
-
-            int cantidad = Integer.parseInt(textoCantidad);
-            double precioVenta = Double.parseDouble(textoPrecio);
-
-            // Validamos stock disponible antes de vender
-            if (productoSeleccionadoTemporal.getStock() < cantidad) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Stock insuficiente. Disponible: " + productoSeleccionadoTemporal.getStock(), "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
-            // Creamos el Detalle de Pedido (Venta)
-            Entidades.DetallePedido nuevoDetalle = new Entidades.DetallePedido(cantidad, precioVenta, productoSeleccionadoTemporal);
-            carritoTemporal.add(nuevoDetalle);
-            
-            actualizarTablaCarrito();
-
-            // Bloqueamos el cliente para que no lo cambien a mitad de la factura
-            btnBuscarCliente.setEnabled(false); // Tu botón de lupa de cliente
-
-            // Limpiamos cajas de producto
-            productoSeleccionadoTemporal = null;
-            txtProductoSeleccionado.setText("");
-            txtCantidad.setText("");
-            txtPrecioVenta.setText("");
-
-        } catch (Exception ex) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Verifique los datos ingresados: " + ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        if (productoSeleccionadoTemporal == null) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Seleccione un producto.");
+            return;
         }
+        if (clienteSeleccionadoTemporal == null) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Seleccione un cliente.");
+            return;
+        }
+
+        int cantidad = Integer.parseInt(txtCantidad.getText().trim());
+        double precioVenta = Double.parseDouble(txtPrecioVenta.getText().trim().replace(",", "."));
+
+        if (productoSeleccionadoTemporal.getStock() < cantidad) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Stock insuficiente.", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Entidades.DetallePedido nuevoDetalle = new Entidades.DetallePedido(cantidad, precioVenta, productoSeleccionadoTemporal);
+        carritoTemporal.add(nuevoDetalle);
+        actualizarTablaCarrito();
+
+        if (!carritoTemporal.isEmpty()) {
+            jdFechaRecepcion.setEnabled(false);
+            jdFechaLimitePago.setEnabled(false);
+            btnBuscarCliente.setEnabled(false);
+            cmbTipoVenta.setEnabled(false);
+        }
+
+        productoSeleccionadoTemporal = null;
+        txtProductoSeleccionado.setText("");
+        txtCantidad.setText("");
+        txtPrecioVenta.setText("");
+
+    } catch (Exception ex) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Verifique los datos: " + ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+    }
     }//GEN-LAST:event_btnAgregarAlCarritoActionPerformed
 
     private void btnProcesarCompraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProcesarCompraActionPerformed
+        
         if (carritoTemporal.isEmpty()) {
         javax.swing.JOptionPane.showMessageDialog(this, "El carrito de ventas está vacío.", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
         return;
     }
+        
 
     try {
-        if(this.clienteSeleccionadoTemporal == null){
+        if (this.clienteSeleccionadoTemporal == null) {
             javax.swing.JOptionPane.showMessageDialog(this, "Debe seleccionar un cliente válido.");
             return;
         }
 
-        // 1. Recolección de datos de la interfaz
         String estadoSeleccionado = cmbEstado.getSelectedItem().toString();
-        String tipoVenta = cmbTipoVenta.getSelectedItem().toString(); 
+        String tipoVenta = cmbTipoVenta.getSelectedItem().toString();
         String fechaEmision = java.time.LocalDate.now().toString();
         
-        // Traductor de fechas del Calendario visual a Texto para tu Base de Datos
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
-        
-        // Extraer Fecha de Recepción obligatoria
         String fechaRecepcion = "";
+        
         if (jdFechaRecepcion.getDate() != null) {
             fechaRecepcion = sdf.format(jdFechaRecepcion.getDate());
         } else {
-            javax.swing.JOptionPane.showMessageDialog(this, "Por favor, seleccione una fecha de entrega en el calendario.");
+            javax.swing.JOptionPane.showMessageDialog(this, "Seleccione una fecha de entrega en el calendario.");
             return;
         }
 
-        // Extraer Fecha Límite de Pago
         String fechaLimitePago = "";
         if (tipoVenta.equals("Credito")) {
             if (jdFechaLimitePago.getDate() != null) {
                 fechaLimitePago = sdf.format(jdFechaLimitePago.getDate());
             } else {
-                javax.swing.JOptionPane.showMessageDialog(this, "Para ventas a crédito, debe seleccionar una fecha límite de pago.");
+                javax.swing.JOptionPane.showMessageDialog(this, "Debe seleccionar una fecha límite de pago.");
                 return;
             }
         } else {
-            // Si es al contado, forzamos la fecha de hoy
-            fechaLimitePago = fechaEmision; 
+            fechaLimitePago = fechaEmision;
         }
 
-        // 2. Lógica Financiera: Contado vs Crédito
         double deudaInicial = 0.0;
-        
         if (tipoVenta.equals("Credito")) {
-            // El cliente debe, así que sumamos el total del carrito para registrar la deuda
             for (Entidades.DetallePedido detalle : carritoTemporal) {
                 deudaInicial += (detalle.getCantidadVendida() * detalle.getPrecioVentaCongelado());
             }
-        } else {
-            // Si es al contado, la deuda se queda en 0.0 y forzamos la fecha límite a hoy por seguridad
-            fechaLimitePago = fechaEmision; 
         }
 
-        // 3. Creación de la Cabecera del Pedido
         Entidades.Pedido nuevoPedido = new Entidades.Pedido(
             fechaEmision, 
             fechaRecepcion, 
@@ -392,11 +379,12 @@ public class FrmPedido extends javax.swing.JFrame {
             deudaInicial, 
             this.clienteSeleccionadoTemporal
         );
-     
-        // 5. Inyección a la Base de Datos y Memoria
+        
+        nuevoPedido.getDetalles().addAll(carritoTemporal);
+
         this.clienteSeleccionadoTemporal.getPedidos().add(nuevoPedido);
         gestorVentas.registrarVenta(nuevoPedido);
-
+        
         javax.swing.JOptionPane.showMessageDialog(this, "¡Venta registrada con éxito!");
         this.dispose(); 
 

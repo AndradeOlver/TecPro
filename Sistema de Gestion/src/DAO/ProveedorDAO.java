@@ -123,4 +123,18 @@ public class ProveedorDAO {
             return false;
         }
     }
+    public boolean eliminar(String ruc) {
+    String sql = "DELETE FROM Proveedor WHERE RUC = ?";
+    try (Connection con = ConexionSQL.probarConexion();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        
+        ps.setString(1, ruc);
+        ps.execute();
+        return true;
+        
+    } catch (SQLException e) {
+        System.err.println("Error de integridad referencial al eliminar proveedor: " + e.getMessage());
+        return false;
+    }
+}
 }

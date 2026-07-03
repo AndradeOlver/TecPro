@@ -75,6 +75,7 @@ public class FrmProveedores extends javax.swing.JFrame {
         textContacto = new java.awt.TextField();
         labelContacto = new java.awt.Label();
         btnRegresar = new javax.swing.JButton();
+        btnEliminar = new javax.swing.JButton();
 
         itemEditar.setText("Editar");
         itemEditar.addActionListener(this::itemEditarActionPerformed);
@@ -162,6 +163,9 @@ public class FrmProveedores extends javax.swing.JFrame {
         btnRegresar.setText("Regresar");
         btnRegresar.addActionListener(this::btnRegresarActionPerformed);
 
+        btnEliminar.setText("Eliminar Proveedor");
+        btnEliminar.addActionListener(this::btnEliminarActionPerformed);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -209,16 +213,17 @@ public class FrmProveedores extends javax.swing.JFrame {
                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                             .addComponent(btnBuscarCodigo, javax.swing.GroupLayout.Alignment.LEADING)
                                             .addComponent(btnBuscarPorNombre, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                        .addGap(28, 28, 28)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addComponent(textBusquedaCodigo, javax.swing.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE)
-                                            .addComponent(textBusquedaNombre, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                        .addGap(69, 69, 69))
+                                        .addGap(28, 28, 28))
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(btnQuitarFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addContainerGap(301, Short.MAX_VALUE))))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(textBusquedaCodigo, javax.swing.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE)
+                                        .addComponent(textBusquedaNombre, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(69, 69, 69))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(46, 46, 46))))))
         );
@@ -271,7 +276,8 @@ public class FrmProveedores extends javax.swing.JFrame {
                     .addComponent(btnActualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnQuitarFiltro))
+                    .addComponent(btnQuitarFiltro)
+                    .addComponent(btnEliminar))
                 .addGap(41, 41, 41))
         );
 
@@ -513,6 +519,30 @@ public class FrmProveedores extends javax.swing.JFrame {
     // Cerramos y destruimos la ventana actual en la que estamos
     this.dispose();
     }//GEN-LAST:event_btnRegresarActionPerformed
+
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+        // TODO add your handling code here:
+        int fila = tblClientes.getSelectedRow(); 
+    if (fila != -1) {
+        int confirmacion = javax.swing.JOptionPane.showConfirmDialog(this, 
+            "¿Está seguro que desea eliminar el proveedor seleccionado?", 
+            "Confirmar", javax.swing.JOptionPane.YES_NO_OPTION);
+            
+        if (confirmacion == javax.swing.JOptionPane.YES_OPTION) {
+            try {
+                // Se extrae el RUC de la primera columna
+                String ruc = tblClientes.getValueAt(fila, 0).toString();
+                gestor.eliminarProveedor(ruc);
+                javax.swing.JOptionPane.showMessageDialog(this, "Proveedor eliminado correctamente.");
+                actualizarTabla();
+            } catch (RuntimeException ex) {
+                javax.swing.JOptionPane.showMessageDialog(this, ex.getMessage(), "Error de Dependencia", javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    } else {
+        javax.swing.JOptionPane.showMessageDialog(this, "Seleccione un proveedor de la tabla primero.", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+    }
+    }//GEN-LAST:event_btnEliminarActionPerformed
       // 4. Lógica de Lectura Visual (El puente entre la lista y la pantalla)
     private void actualizarTabla() {
         // Capturamos el modelo estructural de la tabla (tblClientes)
@@ -596,6 +626,7 @@ public class FrmProveedores extends javax.swing.JFrame {
     private javax.swing.JButton btnBuscarCodigo;
     private javax.swing.JButton btnBuscarPorNombre;
     private javax.swing.JButton btnCancelar;
+    private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnQuitarFiltro;
     private javax.swing.JButton btnRegresar;

@@ -137,4 +137,10 @@ import Entidades.OrdenCompra;
             throw new RuntimeException("Error crítico: No se pudieron eliminar las órdenes de la base de datos.");
         }
     }
+    public void eliminarProducto(int id) {
+        boolean exito = productoDAO.eliminar(id);
+        if (!exito) {
+            throw new RuntimeException("Acción denegada: Este producto no se puede eliminar porque cuenta con stock en el Kardex o historial de transacciones asociadas.");
+        }
+    }
 }

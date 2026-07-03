@@ -118,4 +118,18 @@ public class ClienteDAO {
             return false;
         }
     }
+    public boolean eliminar(int id) {
+    String sql = "DELETE FROM Cliente WHERE ID = ?";
+    try (Connection con = ConexionSQL.probarConexion();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        
+        ps.setInt(1, id);
+        ps.execute();
+        return true;
+        
+    } catch (SQLException e) {
+        System.err.println("Error de integridad referencial: " + e.getMessage());
+        return false;
+    }
+}
 }

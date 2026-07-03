@@ -80,6 +80,7 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         btnProcesar = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
+        btnLimpiarCancelados = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -137,6 +138,9 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
         btnCancelar.setText("Cancelar");
         btnCancelar.addActionListener(this::btnCancelarActionPerformed);
 
+        btnLimpiarCancelados.setText("Eliminar Cancelados");
+        btnLimpiarCancelados.addActionListener(this::btnLimpiarCanceladosActionPerformed);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -146,7 +150,9 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnProcesar)
-                        .addGap(320, 320, 320)
+                        .addGap(72, 72, 72)
+                        .addComponent(btnLimpiarCancelados, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(80, 80, 80)
                         .addComponent(btnCancelar))
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
@@ -168,7 +174,8 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
                 .addGap(30, 30, 30)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnProcesar)
-                    .addComponent(btnCancelar))
+                    .addComponent(btnCancelar)
+                    .addComponent(btnLimpiarCancelados))
                 .addGap(55, 55, 55))
         );
 
@@ -266,6 +273,23 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnCancelarActionPerformed
 
+    private void btnLimpiarCanceladosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarCanceladosActionPerformed
+        // TODO add your handling code here:
+        int confirmacion = javax.swing.JOptionPane.showConfirmDialog(this, 
+        "¿Seguro que desea eliminar permanentemente todos los pedidos en estado 'Cancelado'?", 
+        "Limpieza del Sistema", javax.swing.JOptionPane.YES_NO_OPTION);
+        
+    if (confirmacion == javax.swing.JOptionPane.YES_OPTION) {
+        try {
+            gestorVentas.eliminarPedidosCancelados();
+            javax.swing.JOptionPane.showMessageDialog(this, "Limpieza de pedidos cancelados completada exitosamente.");
+            actualizarTabla();
+        } catch (Exception ex) {
+            javax.swing.JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    }//GEN-LAST:event_btnLimpiarCanceladosActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -320,6 +344,7 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelar;
+    private javax.swing.JButton btnLimpiarCancelados;
     private javax.swing.JButton btnProcesar;
     private javax.swing.JButton btnRegresar;
     private javax.swing.JLabel jLabel1;

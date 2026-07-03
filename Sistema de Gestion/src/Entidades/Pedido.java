@@ -25,6 +25,7 @@ public class Pedido {
     private Cliente cliente;
     private List<DetallePedido> detallesVenta;
     private List<PagoAbono> abonos;
+    
 
     public Pedido( String fechaEmision, String fechaRecepcion, String estado, String tipoVenta, String fechaLimitePago, double deudaPendiente,Cliente cliente) {
        
@@ -81,11 +82,17 @@ public class Pedido {
         return estado;
     }
 
-    public void setEstado(String estado) {
-        if (estado.equals("Activo") || estado.equals("Pendiente") || estado.equals("Entregado") || estado.equals("Cancelado")) {
-            this.estado = estado;
+   public void setEstado(String nuevoEstado) {
+        // Lógica de protección: Solo permitimos cambios manuales si no es a "Abonada"
+        if (nuevoEstado.equals("Abonada")) {
+            throw new IllegalArgumentException("El estado 'Abonada' solo puede ser asignado automáticamente al liquidar la deuda.");
+        }
+        
+        if (nuevoEstado.equals("Solicitada") || nuevoEstado.equals("Pendiente") || 
+            nuevoEstado.equals("Procesada") || nuevoEstado.equals("Cancelada")) {
+            this.estado = nuevoEstado;
         } else {
-            throw new IllegalArgumentException("Error: Estado inválido. Solo se permite 'Activo', 'Pendiente', 'Entregado' o 'Cancelado'.");
+            throw new IllegalArgumentException("Estado de pedido inválido.");
         }
     }
 
@@ -239,6 +246,17 @@ public class Pedido {
             }
         }
         return total;
+    }
+    // MÉTODO CRÍTICO: Este método controla el ciclo de vida real del estado
+    public void actualizarEstadoSegunPago() {
+        if (this.deudaPendiente <= 0) {
+            this.estado = "Abonada";
+        } else {
+            // Si tiene deuda, se queda como estaba o pasa a "Pendiente" (de entrega)
+            if (this.estado.equals("Solicitada")) {
+                this.estado = "Pendiente"; 
+            }
+        }
     }
 
     
