@@ -192,5 +192,42 @@ public class PedidoDAO {
             return false;
         }
     }
+    public boolean registrarTransaccional(Connection con, Pedido p) throws SQLException {
+    String sql = "INSERT INTO Pedido (Cliente_ID, FechaEmision, FechaRecepcion, Estado, TipoVenta, FechaLimitePago, DeudaPendiente) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    
+    // Solo cerramos el PreparedStatement, la conexión sigue abierta para los detalles
+    try (PreparedStatement ps = con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+        ps.setInt(1, p.getCliente().getCodigo());
+        ps.setDate(2, java.sql.Date.valueOf(p.getFechaEmision()));
+        if (p.getFechaRecepcion() != null) ps.setDate(3, java.sql.Date.valueOf(p.getFechaRecepcion()));
+        else ps.setNull(3, java.sql.Types.DATE);
+        
+        ps.setString(4, p.getEstado());
+        ps.setString(5, p.getTipoVenta());
+        
+        if (p.getFechaLimitePago() != null) ps.setDate(6, java.sql.Date.valueOf(p.getFechaLimitePago()));
+        else ps.setNull(6, java.sql.Types.DATE);
+        
+        ps.setDouble(7, p.getDeudaPendiente());
+        ps.execute();
+        
+        try (ResultSet rs = ps.getGeneratedKeys()) {
+            if (rs.next()) {
+                p.setCodigo(rs.getInt(1));
+            }
+        }
+        return true;
+    }
+}
+    public boolean actualizarEstadoYDeudaTransaccional(Connection con, int codigoPedido, String nuevoEstado, double nuevaDeuda) throws SQLException {
+    String sql = "UPDATE Pedido SET Estado = ?, DeudaPendiente = ? WHERE Codigo = ?";
+    try (PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setString(1, nuevoEstado);
+        ps.setDouble(2, nuevaDeuda);
+        ps.setInt(3, codigoPedido);
+        ps.execute();
+        return true;
+    }
+}
     
 }

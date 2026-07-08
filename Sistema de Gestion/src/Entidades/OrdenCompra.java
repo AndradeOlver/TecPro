@@ -63,15 +63,16 @@ public class OrdenCompra {
             throw new IllegalArgumentException("Error: Formato de fecha inválido. Utilice el formato AAAA-MM-DD.");
         }
     }
-    public String getEstado() { return estado; }
+    public String getEstado() {
+        return this.estado;
+    }
     
     public void setEstado(String estado) {
         if (estado.equals("Solicitada") || estado.equals("Pendiente") || 
-            estado.equals("Procesada") || estado.equals("Abonada") || 
-            estado.equals("Cancelada")) {
+            estado.equals("Procesada") || estado.equals("Cancelada")) {
             this.estado = estado;
         } else {
-            throw new IllegalArgumentException("Error: Estado de orden inválido.");
+            throw new IllegalArgumentException("Error: Estado de orden de compra inválido.");
         }
     }
 

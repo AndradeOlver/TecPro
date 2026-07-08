@@ -91,8 +91,14 @@ import Entidades.OrdenCompra;
     public void avanzarEstadoOrden(int codigo) {
         Entidades.OrdenCompra orden = ordenCompraDAO.buscarPorCodigo(codigo);
         if(orden != null) {
-            orden.avanzarEstado(); // Ejecuta tu regla de negocio (Solicitada -> Pendiente -> Procesada)
+            orden.avanzarEstado();
+            // Ejecuta tu regla de negocio (Solicitada -> Pendiente -> Procesada)
             ordenCompraDAO.actualizarEstado(codigo, orden.getEstado());
+            
+            // CORRECCIÓN: Si el nuevo estado es "Procesada", se ingresan los productos al Kardex
+            if (orden.getEstado().equals("Procesada")) {
+                this.procesarStockKardex(codigo);
+            }
         }
     }
 
@@ -111,22 +117,40 @@ import Entidades.OrdenCompra;
         return orden;
     }
 
-    public void procesarStockKardex(int codigoOrden) {
-        // 1. Buscamos la orden y sus productos (lotes) de la BD
-        OrdenCompra orden = ordenCompraDAO.buscarPorCodigo(codigoOrden);
-        if (orden == null) return;
+  public void procesarStockKardex(int codigoOrden) {
+    OrdenCompra orden = ordenCompraDAO.buscarPorCodigo(codigoOrden);
+    if (orden == null) return;
+    orden.getLotes().addAll(loteProductoDAO.obtenerLotesPorOrden(codigoOrden));
+
+    List<Entidades.MovimientosKardex> movimientosGenerados = orden.procesarEntradaAlmacen();
+
+    // Iniciamos la transacción controlada
+    try (java.sql.Connection con = DAO.ConexionSQL.probarConexion()) {
+        con.setAutoCommit(false);
         
-        orden.getLotes().addAll(loteProductoDAO.obtenerLotesPorOrden(codigoOrden));
+        try {
+            for (Entidades.MovimientosKardex mk : movimientosGenerados) {
+                // Registro en el Kardex
+                boolean kOK = kardexDAO.registrarTransaccional(con, mk);
+                if (!kOK) throw new java.sql.SQLException("Error al insertar registro en Kardex para producto ID: " + mk.getProducto().getId());
 
-        // 2. Ejecutamos tu propio método matemático de Entidades.OrdenCompra
-        List<Entidades.MovimientosKardex> movimientosGenerados = orden.procesarEntradaAlmacen();
-
-        // 3. Guardamos los resultados del Kardex y actualizamos los precios/stock de los Productos
-        for (Entidades.MovimientosKardex mk : movimientosGenerados) {
-            kardexDAO.registrar(mk);
-            productoDAO.actualizar(mk.getProducto());
+                // Actualización del Producto
+                boolean pOK = productoDAO.actualizarTransaccional(con, mk.getProducto());
+                if (!pOK) throw new java.sql.SQLException("Error al actualizar stock/precio del producto ID: " + mk.getProducto().getId());
+            }
+            
+            // Si el bucle termina con éxito para todos los productos, se aprueba la transacción
+            con.commit();
+            
+        } catch (Exception e) {
+            // Si falla en CUALQUIER iteración, retrocedemos todo el lote
+            con.rollback();
+            throw new RuntimeException("Fallo al procesar el inventario. Se han revertido los cambios: " + e.getMessage());
         }
+    } catch (java.sql.SQLException e) {
+        System.err.println("Error de base de datos en procesarStockKardex: " + e.getMessage());
     }
+}
 
     public java.util.List<Entidades.MovimientosKardex> obtenerKardexPorProducto(int idProducto) {
         return kardexDAO.obtenerPorProducto(idProducto);

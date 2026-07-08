@@ -65,4 +65,22 @@ public class MovimientosKardexDAO {
         }
         return lista;
     }
+    public boolean registrarTransaccional(Connection con, MovimientosKardex mk) throws SQLException {
+    String sql = "INSERT INTO MovimientosKardex (Producto_ID, FechaMovimiento, TipoMovimiento, CantidadFisica, ValorUnitario, SaldoCantidadActual, SaldoCostoPromedio) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    try (PreparedStatement ps = con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+        ps.setInt(1, mk.getProducto().getId());
+        ps.setDate(2, java.sql.Date.valueOf(mk.getFechaMovimiento()));
+        ps.setString(3, mk.getTipoMovimiento());
+        ps.setInt(4, mk.getCantidadFisica());
+        ps.setDouble(5, mk.getValorUnitario());
+        ps.setInt(6, mk.getSaldoCantidadActual());
+        ps.setDouble(7, mk.getSaldoCostoPromedio());
+        ps.execute();
+        
+        try (ResultSet rs = ps.getGeneratedKeys()) {
+            if (rs.next()) mk.setIdMovimiento(rs.getInt(1));
+        }
+        return true;
+    }
+}
 }

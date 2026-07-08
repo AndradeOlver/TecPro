@@ -37,16 +37,19 @@ public class FrmPedido extends javax.swing.JFrame {
      * Creates new form FrmPedido
      */
    // Constructor adaptado
-    public FrmPedido(GestorVentas gVentas, GestorContactos gContactos, GestorInventario gInv) {
+    public FrmPedido(Gestores.GestorVentas gVentas, Gestores.GestorContactos gContactos, Gestores.GestorInventario gInv) {
         initComponents();
         this.gestorVentas = gVentas;
         this.gestorContactos = gContactos;
         this.gestorInventario = gInv;
-        this.carritoTemporal = new ArrayList<>();
+        this.carritoTemporal = new java.util.ArrayList<>();
         
         // Bloqueo de cajas
         txtProductoSeleccionado.setEditable(false);
         txtClienteSeleccionado.setEditable(false);
+        
+        // CORRECCIÓN: Se actualiza el ComboBox programáticamente para evitar tocar el código bloqueado de NetBeans
+        cmbEstado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pendiente", "Entregado" }));
         
         this.setTitle("Generar Nuevo Pedido (Venta)");
     }

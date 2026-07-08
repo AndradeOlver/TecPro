@@ -24,68 +24,99 @@ public class GestorVentas {
     private PagoAbonoDAO pagoAbonoDAO;
 
     public GestorVentas() {
-        this.pedidoDAO = new PedidoDAO();
-        this.detallePedidoDAO = new DetallePedidoDAO();
-        this.gestorInventario = new GestorInventario(); // Conectamos con el módulo de inventario
-    }
+    this.pedidoDAO = new PedidoDAO();
+    this.detallePedidoDAO = new DetallePedidoDAO();
+    this.gestorInventario = new GestorInventario();
+    this.pagoAbonoDAO = new PagoAbonoDAO(); // <-- CORRECCIÓN: Inicialización que faltaba
+}
 
     public void registrarVenta(Pedido nuevoPedido) {
-        if (nuevoPedido == null) {
-            throw new IllegalArgumentException("Error: El pedido no puede ser nulo.");
-        }
+    if (nuevoPedido == null || nuevoPedido.getDetalles() == null || nuevoPedido.getDetalles().isEmpty()) {
+        throw new IllegalArgumentException("Error: Datos de pedido inválidos o sin productos.");
+    }
+
+    // 1. Abrimos la conexión AQUÍ para controlar toda la transacción
+    try (java.sql.Connection con = DAO.ConexionSQL.probarConexion()) {
         
-        if (nuevoPedido.getDetalles() == null || nuevoPedido.getDetalles().isEmpty()) {
-            throw new IllegalArgumentException("Error: No se puede registrar un pedido sin productos.");
-        }
+        // Apagamos el guardado automático
+        con.setAutoCommit(false); 
+        
+        try {
+            // 2. Guardamos Cabecera
+            boolean pedidoGuardado = pedidoDAO.registrarTransaccional(con, nuevoPedido);
+            if (!pedidoGuardado) throw new java.sql.SQLException("Fallo interno al crear cabecera del pedido.");
 
-        // 1. Guardamos la cabecera del Pedido en SQL Server
-        boolean pedidoGuardado = pedidoDAO.registrar(nuevoPedido);
-        if (!pedidoGuardado) {
-            throw new RuntimeException("Error crítico: Falló la creación del pedido en la base de datos.");
-        }
+            // 3. Guardamos Detalles
+            boolean detallesGuardados = detallePedidoDAO.registrarDetallesTransaccional(con, nuevoPedido.getCodigo(), nuevoPedido.getDetalles());
+            if (!detallesGuardados) throw new java.sql.SQLException("Fallo interno al guardar los productos del pedido.");
 
-        // 2. Guardamos todos los productos de ese pedido (Detalles) en SQL Server
-        boolean detallesGuardados = detallePedidoDAO.registrarDetalles(nuevoPedido.getCodigo(), nuevoPedido.getDetalles());
-        if (!detallesGuardados) {
-            throw new RuntimeException("Error crítico: Falló la creación de los detalles del pedido.");
+            // 4. Si todo salió perfecto, CONFIRMAMOS los datos en el disco duro
+            con.commit();
+            
+        } catch (Exception e) {
+            // 5. Si CUALQUIER COSA falla, REVERTIMOS TODO y no quedan datos fantasma
+            con.rollback();
+            throw new RuntimeException("Error crítico. Transacción revertida: " + e.getMessage());
         }
+    } catch (java.sql.SQLException e) {
+        throw new RuntimeException("Error de conexión a la base de datos: " + e.getMessage());
+    }
 
-        // 3. LA NUEVA LÓGICA DE INVENTARIO
-        // Solo descontamos físicamente de la base de datos si el pedido ya fue entregado al cliente
-        if (nuevoPedido.getEstado().equalsIgnoreCase("Entregado")) {
-            for (DetallePedido dp : nuevoPedido.getDetalles()) {
-                // Pasamos el ID del producto y la cantidad en NEGATIVO para restar
-                gestorInventario.modificarStock(dp.getProducto().getId(), -dp.getCantidadVendida());
-            }
+    // 6. Lógica de inventario (en memoria/posterior a la transacción)
+    if (nuevoPedido.getEstado().equalsIgnoreCase("Entregado")) {
+        for (Entidades.DetallePedido dp : nuevoPedido.getDetalles()) {
+            gestorInventario.modificarStock(dp.getProducto().getId(), -dp.getCantidadVendida());
         }
     }
+}
 
     public void registrarPagoAbono(PagoAbono abono) {
-        if (abono.getMontoAbonado() <= 0) {
-            throw new IllegalArgumentException("Error: El monto a abonar debe ser mayor a cero.");
-        }
-
-        double deudaActual = abono.getPedido().getDeudaPendiente();
-        double nuevaDeuda = deudaActual - abono.getMontoAbonado();
-        
-        if (nuevaDeuda < 0) {
-            throw new IllegalArgumentException("Error: El abono supera la deuda actual.");
-        }
-
-        String nuevoEstado = (nuevaDeuda == 0) ? "Entregado" : "Pendiente";
-
-        // 1. Actualizamos la Deuda en el Pedido (Como tenías antes)
-        boolean pedidoActualizado = pedidoDAO.actualizarEstadoYDeuda(abono.getPedido().getCodigo(), nuevoEstado, nuevaDeuda);
-        if (!pedidoActualizado) {
-            throw new RuntimeException("Error: No se pudo registrar el abono en el Pedido.");
-        }
-        
-        // 2. NUEVO: Insertamos el registro físico del Abono en su tabla
-        boolean pagoRegistrado = pagoAbonoDAO.registrar(abono);
-        if (!pagoRegistrado) {
-            throw new RuntimeException("Error: No se pudo guardar el comprobante en la tabla PagoAbono.");
-        }
+    if (abono.getMontoAbonado() <= 0) {
+        throw new IllegalArgumentException("Error: El monto a abonar debe ser mayor a cero.");
     }
+
+    double deudaActual = abono.getPedido().getDeudaPendiente();
+    double nuevaDeuda = deudaActual - abono.getMontoAbonado();
+    
+    if (nuevaDeuda < 0) {
+        throw new IllegalArgumentException("Error: El abono supera la deuda actual.");
+    }
+
+    // 1. Calculamos el nuevo estado de forma LOCAL (sin alterar el objeto real todavía)
+    String nuevoEstado = abono.getPedido().getEstado(); 
+    if (nuevaDeuda <= 0) {
+        nuevoEstado = "Abonada";
+    }
+
+    // 2. Iniciamos el bloque transaccional con la base de datos
+    try (java.sql.Connection con = DAO.ConexionSQL.probarConexion()) {
+        con.setAutoCommit(false); // Desactivamos el guardado automático
+        
+        try {
+            // A. Intentamos actualizar la cabecera del pedido en la BD
+            boolean pedidoActualizado = pedidoDAO.actualizarEstadoYDeudaTransaccional(con, abono.getPedido().getCodigo(), nuevoEstado, nuevaDeuda);
+            if (!pedidoActualizado) throw new java.sql.SQLException("Fallo al actualizar estado y deuda en el Pedido.");
+            
+            // B. Intentamos insertar el recibo de abono en la BD
+            boolean pagoRegistrado = pagoAbonoDAO.registrarTransaccional(con, abono);
+            if (!pagoRegistrado) throw new java.sql.SQLException("Fallo al insertar el registro de PagoAbono.");
+            
+            // C. Si ambas operaciones en la BD fueron exitosas, guardamos los cambios de forma permanente
+            con.commit();
+            
+            // 3. ¡ÉXITO EN DISCO! Ahora procedemos a modificar de forma segura la memoria RAM
+            abono.getPedido().setDeudaPendiente(nuevaDeuda);
+            
+        } catch (Exception e) {
+            // Si algo falla a mitad de camino, cancelamos todo en la BD
+            con.rollback();
+            // La memoria RAM se queda intacta con los valores originales, evitando inconsistencias visuales
+            throw new RuntimeException("No se pudo registrar el abono. Operación revertida: " + e.getMessage());
+        }
+    } catch (java.sql.SQLException e) {
+        throw new RuntimeException("Error de comunicación con el servidor de base de datos: " + e.getMessage());
+    }
+}
     
     public List<Pedido> obtenerHistorialPedidos() {
     return pedidoDAO.obtenerTodos();

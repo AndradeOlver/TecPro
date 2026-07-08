@@ -175,4 +175,22 @@ public class ProductoDAO {
             return false;
         }
     }
+    public boolean actualizarTransaccional(Connection con, Producto p) throws SQLException {
+    String sql = "UPDATE Producto SET Descripcion=?, PrecioVentaBase=?, PrecioCompra=?, Stock=? WHERE ID=?";
+    try (PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setString(1, p.getDescripcion());
+        if (p.getPrecioVentaBase() != null) ps.setDouble(2, p.getPrecioVentaBase());
+        else ps.setNull(2, java.sql.Types.DECIMAL);
+        
+        if (p.getPrecioCompra() != null) ps.setDouble(3, p.getPrecioCompra());
+        else ps.setNull(3, java.sql.Types.DECIMAL);
+        
+        if (p.getStock() != null) ps.setInt(4, p.getStock());
+        else ps.setNull(4, java.sql.Types.INTEGER);
+        
+        ps.setInt(5, p.getId());
+        ps.execute();
+        return true;
+    }
+}
 }

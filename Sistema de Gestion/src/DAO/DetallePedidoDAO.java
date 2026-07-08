@@ -74,4 +74,19 @@ public class DetallePedidoDAO {
         }
         return lista;
     }
+    public boolean registrarDetallesTransaccional(Connection con, int codigoPedido, List<DetallePedido> detalles) throws SQLException {
+    String sql = "INSERT INTO DetallePedido (Pedido_Codigo, Producto_ID, CantidadVendida, PrecioVentaCongelado) VALUES (?, ?, ?, ?)";
+    
+    try (PreparedStatement ps = con.prepareStatement(sql)) {
+        for (DetallePedido dp : detalles) {
+            ps.setInt(1, codigoPedido);
+            ps.setInt(2, dp.getProducto().getId());
+            ps.setInt(3, dp.getCantidadVendida());
+            ps.setDouble(4, dp.getPrecioVentaCongelado());
+            ps.addBatch(); 
+        }
+        ps.executeBatch();
+        return true;
+    }
+}
 }

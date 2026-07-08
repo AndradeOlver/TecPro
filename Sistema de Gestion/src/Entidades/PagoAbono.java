@@ -92,9 +92,8 @@ public class PagoAbono {
             throw new IllegalStateException("Error: Este pedido ya está pagado en su totalidad.");
         }
 
-        // 2. El "Efecto Dominó" Financiero: Le mandamos el dinero al Pedido
-        // Usamos el método registrarPago que creamos hace unas clases
-        this.pedido.registrarPago(this);
+        // CORRECCIÓN: Se envía exclusivamente el monto decimal, no el comprobante entero
+        this.pedido.registrarPago(this.montoAbonado);
 
         // 3. Generamos el comprobante o huella digital de la transacción
         String recibo = String.format(
@@ -114,7 +113,6 @@ public class PagoAbono {
             this.pedido.getDeudaPendiente(),
             this.pedido.getEstado()
         );
-
         return recibo;
     }
 }

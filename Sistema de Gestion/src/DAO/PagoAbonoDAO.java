@@ -40,5 +40,21 @@ public class PagoAbonoDAO {
             return false;
         }
     }
+    public boolean registrarTransaccional(Connection con, PagoAbono abono) throws SQLException {
+    String sql = "INSERT INTO PagoAbono (Pedido_Codigo, FechaAbono, MontoAbonado) VALUES (?, ?, ?)";
+    try (PreparedStatement ps = con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+        ps.setInt(1, abono.getPedido().getCodigo());
+        ps.setDate(2, java.sql.Date.valueOf(abono.getFechaAbono()));
+        ps.setDouble(3, abono.getMontoAbonado());
+        ps.execute();
+        
+        try (ResultSet rs = ps.getGeneratedKeys()) {
+            if (rs.next()) {
+                abono.setCodigoRecibo(rs.getInt(1));
+            }
+        }
+        return true;
+    }
+}
     
 }

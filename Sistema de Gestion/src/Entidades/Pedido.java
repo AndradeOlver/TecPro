@@ -27,17 +27,21 @@ public class Pedido {
     private List<PagoAbono> abonos;
     
 
-    public Pedido( String fechaEmision, String fechaRecepcion, String estado, String tipoVenta, String fechaLimitePago, double deudaPendiente,Cliente cliente) {
-       
-       this.deudaPendiente = 0.0;
-       this.fechaEmision = fechaEmision;
-       setFechaRecepcion(fechaRecepcion);
-       setEstado(estado);
-       setTipoVenta(tipoVenta);
-       setFechaLimitePago(fechaLimitePago);
-       setCliente(cliente);
-       this.detallesVenta = new ArrayList<>();
-       this.abonos = new ArrayList<>();
+   public Pedido(String fechaEmision, String fechaRecepcion, String estado, String tipoVenta, String fechaLimitePago, double deudaInicial, Cliente cliente) {
+        this.fechaEmision = fechaEmision;
+        this.fechaRecepcion = fechaRecepcion;
+        this.tipoVenta = tipoVenta;
+        this.fechaLimitePago = fechaLimitePago;
+        this.cliente = cliente; 
+        this.detallesVenta = new java.util.ArrayList<>();
+        
+        // Se asume el monto que viene del carrito y se evalúa automáticamente
+        this.setDeudaPendiente(deudaInicial);
+        
+        // Solo asigna el estado ("Pendiente", etc.) si realmente hay deuda
+        if (this.deudaPendiente > 0) {
+            this.estado = estado;
+        }
     }
     public Pedido(int codigo, String fechaEmision, String fechaRecepcion, String estado, String tipoVenta, String fechaLimitePago, double deudaPendiente, Cliente cliente) {
         this.codigo = codigo;
@@ -79,20 +83,21 @@ public class Pedido {
     }
 
     public String getEstado() {
-        return estado;
+        return this.estado;
+        
     }
 
-   public void setEstado(String nuevoEstado) {
-        // Lógica de protección: Solo permitimos cambios manuales si no es a "Abonada"
-        if (nuevoEstado.equals("Abonada")) {
-            throw new IllegalArgumentException("El estado 'Abonada' solo puede ser asignado automáticamente al liquidar la deuda.");
+   public void setEstado(String estado) {
+        // Bloqueo: No permitir asignar "Abonada" manualmente si aún hay deuda
+        if (estado.equals("Abonada") && this.deudaPendiente > 0) {
+            throw new IllegalArgumentException("Error: No se puede marcar como 'Abonada' si existe deuda pendiente.");
         }
-        
-        if (nuevoEstado.equals("Solicitada") || nuevoEstado.equals("Pendiente") || 
-            nuevoEstado.equals("Procesada") || nuevoEstado.equals("Cancelada")) {
-            this.estado = nuevoEstado;
+
+        if (estado.equals("Pendiente") || estado.equals("Entregado") || 
+            estado.equals("Abonada") || estado.equals("Cancelada")) {
+            this.estado = estado;
         } else {
-            throw new IllegalArgumentException("Estado de pedido inválido.");
+            throw new IllegalArgumentException("Error: Estado de pedido inválido.");
         }
     }
 
@@ -126,11 +131,13 @@ public class Pedido {
         return deudaPendiente;
     }
 
-    public void setDeudaPendiente(double deudaPendiente) {
-        if (deudaPendiente >= 0) {
-            this.deudaPendiente = deudaPendiente;
-        } else {
-            throw new IllegalArgumentException("Error: La deuda pendiente debe ser mayor a 0.");
+   public void setDeudaPendiente(double deudaPendiente) {
+        this.deudaPendiente = deudaPendiente;
+        
+        // Si el abono liquida la deuda o la venta es al contado (deuda 0)
+        if (this.deudaPendiente <= 0) {
+            this.deudaPendiente = 0.0;
+            this.estado = "Abonada"; 
         }
     }
 
@@ -162,13 +169,14 @@ public class Pedido {
         }
         
     }
-    public void registrarPago(PagoAbono abono) {
-    if (abono != null) {
-        this.abonos.add(abono);
-        this.calcularTotalDeuda(); 
-        this.verificarDeuda(); 
+    public void registrarPago(double monto) {
+        this.deudaPendiente -= monto;
+        if (this.deudaPendiente <= 0) {
+            this.deudaPendiente = 0;
+            this.estado = "Abonada"; // Se asigna automáticamente al saldar la deuda
+        }
     }
-    }
+    
     
     
     public void calcularTotalDeuda(){
