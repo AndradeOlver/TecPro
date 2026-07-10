@@ -165,5 +165,15 @@ public class OrdenCompra {
         // 3. Devolvemos la cesta llena de registros
         return movimientosGenerados;
     }
+    // NUEVO MÉTODO: Calcula el costo total de la orden de compra sumando sus lotes
+    public double getTotalOrden() {
+        double total = 0.0;
+        if (this.lotes != null) {
+            for (LoteProducto lote : this.lotes) {
+                total += (lote.getCantidadIngresada() * lote.getPrecioCompraIndividual());
+            }
+        }
+        return total;
+    }
     
 }

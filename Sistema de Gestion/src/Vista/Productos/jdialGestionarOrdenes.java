@@ -38,18 +38,23 @@ public class jdialGestionarOrdenes extends javax.swing.JDialog {
         java.util.List<Entidades.OrdenCompra> lista = gestor.obtenerHistorialCompras();
         
         for (Entidades.OrdenCompra o : lista) {
-            // Calculamos el monto total de esta orden sumando sus lotes internos
-            double montoTotal = 0;
-            for (Entidades.LoteProducto lote : o.getLotes()) {
-                montoTotal += lote.getCantidadIngresada() * lote.getPrecioCompraIndividual();
+            // 1. Pedimos la orden completa con sus lotes a la base de datos
+            Entidades.OrdenCompra ordenCompleta = gestor.obtenerDetallesDeOrden(o.getCodigo());
+            
+            // 2. Calculamos el monto total de esta orden sumando sus lotes internos
+            double montoTotal = 0.0;
+            if (ordenCompleta != null && ordenCompleta.getLotes() != null) {
+                for (Entidades.LoteProducto lote : ordenCompleta.getLotes()) {
+                    montoTotal += lote.getCantidadIngresada() * lote.getPrecioCompraIndividual();
+                }
             }
             
-            // Orden exacto de tu diseño: Fecha, Codigo, Proveedor, Monto Total, Estado
+            // 3. Agregamos la fila respetando el orden exacto de tu diseño
             modelo.addRow(new Object[]{
                 o.getFechaIngreso(),
                 o.getCodigo(),
                 o.getProveedor().getRazonSocial(),
-                String.format("S/ %.2f", montoTotal),
+                String.format("S/ %.2f", montoTotal), // Aquí se mostrará el cálculo perfecto
                 o.getEstado()
             });
         }

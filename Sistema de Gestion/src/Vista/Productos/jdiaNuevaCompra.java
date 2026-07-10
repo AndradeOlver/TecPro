@@ -72,6 +72,7 @@ public class jdiaNuevaCompra extends javax.swing.JDialog {
         cmbEstado = new javax.swing.JComboBox<>();
         jLabel5 = new javax.swing.JLabel();
         btnQuitarDelCarrito = new javax.swing.JButton();
+        lblTotal = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -132,6 +133,8 @@ public class jdiaNuevaCompra extends javax.swing.JDialog {
         btnQuitarDelCarrito.setText("Quitar");
         btnQuitarDelCarrito.addActionListener(this::btnQuitarDelCarritoActionPerformed);
 
+        lblTotal.setText("Total:");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -167,19 +170,22 @@ public class jdiaNuevaCompra extends javax.swing.JDialog {
                 .addComponent(btnAgregarAlCarrito)
                 .addGap(40, 40, 40))
             .addGroup(layout.createSequentialGroup()
-                .addGap(45, 45, 45)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 628, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(45, 45, 45)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 628, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(65, 65, 65)
+                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(cmbEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(28, 28, 28)
+                        .addComponent(btnQuitarDelCarrito)
+                        .addGap(27, 27, 27)
+                        .addComponent(btnProcesarCompra)
+                        .addGap(33, 33, 33)
+                        .addComponent(lblTotal)))
                 .addContainerGap(31, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(65, 65, 65)
-                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(cmbEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(57, 57, 57)
-                .addComponent(btnQuitarDelCarrito)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnProcesarCompra)
-                .addGap(67, 67, 67))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -218,7 +224,8 @@ public class jdiaNuevaCompra extends javax.swing.JDialog {
                     .addComponent(btnProcesarCompra)
                     .addComponent(cmbEstado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5)
-                    .addComponent(btnQuitarDelCarrito))
+                    .addComponent(btnQuitarDelCarrito)
+                    .addComponent(lblTotal))
                 .addGap(15, 15, 15))
         );
 
@@ -358,26 +365,34 @@ public class jdiaNuevaCompra extends javax.swing.JDialog {
     }//GEN-LAST:event_btnQuitarDelCarritoActionPerformed
 
     private void actualizarTablaCarrito() {
-    // 1. Capturamos el modelo y limpiamos el lienzo
-    javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) jTable1.getModel();
-    modelo.setRowCount(0); 
+        // 1. Capturamos el modelo y limpiamos el lienzo
+        javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) jTable1.getModel();
+        modelo.setRowCount(0); 
 
-    // 2. Recorremos la cesta de compras
-    for (Entidades.LoteProducto lote : carritoTemporal) {
+        // Creamos una variable para ir acumulando el total de la orden
+        double totalGeneral = 0.0;
+
+        // 2. Recorremos la cesta de compras
+        for (Entidades.LoteProducto lote : carritoTemporal) {
+            
+            // 3. Calculamos la matemática (Subtotal del lote)
+            double subtotal = lote.getCantidadIngresada() * lote.getPrecioCompraIndividual();
+            
+            // Sumamos el subtotal al total general
+            totalGeneral += subtotal;
+
+            // 4. Pintamos la fila extrayendo los datos del objeto
+            modelo.addRow(new Object[]{
+                lote.getProducto().getId(),                             // Columna 0: ID
+                lote.getProducto().getDescripcion(),                    // Columna 1: Nombre
+                lote.getCantidadIngresada(),                            // Columna 2: Cantidad
+                String.format("S/ %.2f", lote.getPrecioCompraIndividual()), // Columna 3: Costo Unit.
+                String.format("S/ %.2f", subtotal)                      // Columna 4: Subtotal
+            });
+        }
         
-        // 3. Calculamos la matemática (Subtotal del lote)
-        double subtotal = lote.getCantidadIngresada() * lote.getPrecioCompraIndividual();
-
-        // 4. Pintamos la fila extrayendo los datos del objeto
-        modelo.addRow(new Object[]{
-            lote.getProducto().getId(),                             // Columna 0: ID
-            lote.getProducto().getDescripcion(),                    // Columna 1: Nombre
-            lote.getCantidadIngresada(),                            // Columna 2: Cantidad
-            String.format("S/ %.2f", lote.getPrecioCompraIndividual()), // Columna 3: Costo Unit.
-            String.format("S/ %.2f", subtotal)                      // Columna 4: Subtotal
-        });
-    }
-    
+        // 5. Finalmente, imprimimos el total general en el JLabel
+        lblTotal.setText(String.format("Total: S/ %.2f", totalGeneral));
     }
      
     
@@ -400,6 +415,7 @@ public class jdiaNuevaCompra extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
+    private javax.swing.JLabel lblTotal;
     private javax.swing.JTextField txtCantidad;
     private javax.swing.JTextField txtPrecioCompra;
     private javax.swing.JTextField txtProductoSeleccionado;

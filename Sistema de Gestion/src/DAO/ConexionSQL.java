@@ -14,7 +14,7 @@ import java.sql.SQLException;
 public class ConexionSQL {
     // 1. Los Parámetros de Ruta (Cadena de Conexión)
     // Reemplaza "NombreDeTuBD", "tu_usuario" y "tu_contraseña" con tus datos reales.
-     private static final String SERVIDOR = "sql5101.site4now.net";
+        private static final String SERVIDOR = "sql5101.site4now.net";
     private static final String PUERTO = "1433";
     private static final String BASE_DATOS = "db_acb22b_proyectoelvia";
     private static final String USUARIO = "db_acb22b_proyectoelvia_admin";
