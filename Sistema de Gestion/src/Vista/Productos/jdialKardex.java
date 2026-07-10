@@ -106,6 +106,7 @@ public class jdialKardex extends javax.swing.JDialog {
         jScrollPane1 = new javax.swing.JScrollPane();
         tblKardex = new javax.swing.JTable();
         jTitulo = new javax.swing.JLabel();
+        btnPurgar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setSize(new java.awt.Dimension(987, 626));
@@ -148,6 +149,9 @@ public class jdialKardex extends javax.swing.JDialog {
         jTitulo.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
         jTitulo.setText("Tarjeta de Almacen");
 
+        btnPurgar.setText("Borrar Datos");
+        btnPurgar.addActionListener(this::btnPurgarActionPerformed);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -160,6 +164,10 @@ public class jdialKardex extends javax.swing.JDialog {
                 .addContainerGap(305, Short.MAX_VALUE)
                 .addComponent(jTitulo)
                 .addGap(288, 288, 288))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(378, 378, 378)
+                .addComponent(btnPurgar)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -167,8 +175,10 @@ public class jdialKardex extends javax.swing.JDialog {
                 .addGap(23, 23, 23)
                 .addComponent(jTitulo)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 417, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(15, 15, 15))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 397, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2)
+                .addComponent(btnPurgar)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -187,12 +197,38 @@ public class jdialKardex extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnPurgarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPurgarActionPerformed
+      int confirmacion = javax.swing.JOptionPane.showConfirmDialog(this, 
+            "¿Está seguro de purgar el historial del Kardex de este producto?\n"
+          + "Solo se conservará el último ingreso que fija el precio actual.\n"
+          + "Esta acción no se puede deshacer.", 
+            "Confirmar Purga de Inventario", 
+            javax.swing.JOptionPane.YES_NO_OPTION, 
+            javax.swing.JOptionPane.WARNING_MESSAGE);
+            
+        if (confirmacion == javax.swing.JOptionPane.YES_OPTION) {
+            try {
+                // 1. Llamamos al gestor usando la variable global idProducto que ya existe en jdialKardex
+                this.gestor.purgarKardexProducto(this.idProducto);
+                
+                javax.swing.JOptionPane.showMessageDialog(this, "Historial del Kardex purgado exitosamente. Espacio optimizado.");
+                
+                // 2. Usamos tu propio método para repintar la tabla y ver que todo se borró
+                cargarHistorialKardex(); 
+                
+            } catch (RuntimeException ex) {
+                javax.swing.JOptionPane.showMessageDialog(this, ex.getMessage(), "Información", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_btnPurgarActionPerformed
+
     /**
      * @param args the command line arguments
      */
    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnPurgar;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel jTitulo;

@@ -86,6 +86,7 @@ public class FrmPedido extends javax.swing.JFrame {
         cmbTipoVenta = new javax.swing.JComboBox<>();
         jdFechaRecepcion = new com.toedter.calendar.JDateChooser();
         jdFechaLimitePago = new com.toedter.calendar.JDateChooser();
+        btnQuitarDelCarrito = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -130,6 +131,7 @@ public class FrmPedido extends javax.swing.JFrame {
         jLabel5.setText("Estado");
 
         cmbEstado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Activo", "Pendiente", "Entregado", "Cancelado" }));
+        cmbEstado.addActionListener(this::cmbEstadoActionPerformed);
 
         btnProcesarCompra.setText("Procesar Compra");
         btnProcesarCompra.addActionListener(this::btnProcesarCompraActionPerformed);
@@ -146,6 +148,9 @@ public class FrmPedido extends javax.swing.JFrame {
         cmbTipoVenta.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Contado", "Credito" }));
         cmbTipoVenta.addActionListener(this::cmbTipoVentaActionPerformed);
 
+        btnQuitarDelCarrito.setText("Quitar");
+        btnQuitarDelCarrito.addActionListener(this::btnQuitarDelCarritoActionPerformed);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -157,13 +162,15 @@ public class FrmPedido extends javax.swing.JFrame {
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addGroup(layout.createSequentialGroup()
                             .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(18, 18, 18)
-                            .addComponent(cmbEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(36, 36, 36)
-                            .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(cmbEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(cmbTipoVenta, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(40, 40, 40)
+                            .addComponent(btnQuitarDelCarrito)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(cmbTipoVenta, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                             .addComponent(btnProcesarCompra))
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 652, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGroup(layout.createSequentialGroup()
@@ -244,7 +251,8 @@ public class FrmPedido extends javax.swing.JFrame {
                     .addComponent(cmbEstado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnProcesarCompra)
                     .addComponent(jLabel8)
-                    .addComponent(cmbTipoVenta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cmbTipoVenta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnQuitarDelCarrito))
                 .addGap(24, 24, 24))
         );
 
@@ -385,10 +393,38 @@ public class FrmPedido extends javax.swing.JFrame {
         
         nuevoPedido.getDetalles().addAll(carritoTemporal);
 
+        // ... (código anterior donde se crea el nuevoPedido) ...
+        
         this.clienteSeleccionadoTemporal.getPedidos().add(nuevoPedido);
+        
+        // 1. Guarda el pedido en la base de datos
         gestorVentas.registrarVenta(nuevoPedido);
         
+        // 2. NUEVO: Si el usuario eligió "Entregado", procesamos el Kardex inmediatamente
+        if (estadoSeleccionado.equalsIgnoreCase("Entregado")) {
+            try {
+                gestorInventario.procesarSalidaKardex(nuevoPedido);
+                System.out.println("Kardex y Stock actualizados correctamente.");
+            } catch (Exception e) {
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                    "La venta se guardó, pero hubo un error al actualizar el Kardex: " + e.getMessage(), 
+                    "Error de Inventario", javax.swing.JOptionPane.WARNING_MESSAGE);
+            }
+        }
+        
         javax.swing.JOptionPane.showMessageDialog(this, "¡Venta registrada con éxito!");
+        
+        // 1. Buscamos el Menú principal oculto en la memoria...
+        
+        // 1. Buscamos el Menú principal oculto en la memoria y lo volvemos a mostrar
+        for (java.awt.Window window : java.awt.Window.getWindows()) {
+            if (window instanceof Vista.FrmMenu) {
+                window.setVisible(true);
+                break;
+            }
+        }
+        
+        // 2. Ahora sí, cerramos la ventana actual del pedido
         this.dispose(); 
 
     } catch (Exception ex) {
@@ -422,6 +458,35 @@ public class FrmPedido extends javax.swing.JFrame {
         jdFechaLimitePago.setDate(null); 
     }
     }//GEN-LAST:event_cmbTipoVentaActionPerformed
+
+    private void btnQuitarDelCarritoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnQuitarDelCarritoActionPerformed
+            // 1. Verificamos qué fila seleccionó el usuario en la tabla
+        int fila = jTable1.getSelectedRow();
+
+        if (fila != -1) {
+            // 2. Lo eliminamos de nuestra lista temporal en memoria RAM
+            carritoTemporal.remove(fila);
+
+            // 3. Repintamos la tabla
+            actualizarTablaCarrito();
+
+            // 4. (Opcional pero recomendado) Si el carrito se queda vacío, 
+            // volvemos a habilitar las opciones que bloqueaste al inicio
+            if (carritoTemporal.isEmpty()) {
+                jdFechaRecepcion.setEnabled(true);
+                jdFechaLimitePago.setEnabled(true);
+                btnBuscarCliente.setEnabled(true);
+                cmbTipoVenta.setEnabled(true);
+            }
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this, "Seleccione un producto de la tabla para quitarlo del carrito.", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+        }
+        
+    }//GEN-LAST:event_btnQuitarDelCarritoActionPerformed
+
+    private void cmbEstadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbEstadoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmbEstadoActionPerformed
       private void actualizarTablaCarrito() {
         javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) jTable1.getModel();
         modelo.setRowCount(0); 
@@ -449,6 +514,7 @@ public class FrmPedido extends javax.swing.JFrame {
     private javax.swing.JButton btnBuscarCliente;
     private javax.swing.JButton btnBuscarProducto;
     private javax.swing.JButton btnProcesarCompra;
+    private javax.swing.JButton btnQuitarDelCarrito;
     private javax.swing.JButton btnRegresar;
     private javax.swing.JComboBox<String> cmbEstado;
     private javax.swing.JComboBox<String> cmbTipoVenta;

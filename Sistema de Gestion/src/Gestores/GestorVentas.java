@@ -64,9 +64,8 @@ public class GestorVentas {
 
     // 6. Lógica de inventario (en memoria/posterior a la transacción)
     if (nuevoPedido.getEstado().equalsIgnoreCase("Entregado")) {
-        for (Entidades.DetallePedido dp : nuevoPedido.getDetalles()) {
-            gestorInventario.modificarStock(dp.getProducto().getId(), -dp.getCantidadVendida());
-        }
+        // En lugar de hacer un bucle modificando el stock a medias, llamamos al Kardex completo
+        gestorInventario.procesarSalidaKardex(nuevoPedido);
     }
 }
 
@@ -128,19 +127,17 @@ public class GestorVentas {
     }
     return pedido;
     }
-    public void avanzarEstadoPedido(int codigo) {
+   public void avanzarEstadoPedido(int codigo) {
         // Usamos obtenerDetallesDePedido en lugar de buscarPorCodigo para traer la lista de productos
-        Pedido pedido = obtenerDetallesDePedido(codigo); 
-        
+        Pedido pedido = obtenerDetallesDePedido(codigo);
         if(pedido != null) {
             pedido.avanzarEstado(); // Cambia el estado internamente según tus reglas
             pedidoDAO.actualizarEstado(codigo, pedido.getEstado());
             
             // Si el nuevo estado tras avanzar es "Entregado", ejecutamos la salida de almacén
             if (pedido.getEstado().equalsIgnoreCase("Entregado")) {
-                for (DetallePedido dp : pedido.getDetalles()) {
-                    gestorInventario.modificarStock(dp.getProducto().getId(), -dp.getCantidadVendida());
-                }
+                // Reemplazamos el bucle viejo por la transacción de Kardex
+                gestorInventario.procesarSalidaKardex(pedido);
             }
         }
     }

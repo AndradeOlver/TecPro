@@ -167,4 +167,59 @@ import Entidades.OrdenCompra;
             throw new RuntimeException("Acción denegada: Este producto no se puede eliminar porque cuenta con stock en el Kardex o historial de transacciones asociadas.");
         }
     }
+    public void purgarKardexProducto(int idProducto) {
+        // 1. Validamos que el producto realmente exista
+        Entidades.Producto p = productoDAO.buscarPorId(idProducto);
+        if (p == null) {
+            throw new IllegalArgumentException("Error: Producto no encontrado en la base de datos.");
+        }
+        
+        // 2. Ejecutamos la purga en el DAO
+        boolean exito = kardexDAO.purgarHistorial(idProducto);
+        if (!exito) {
+            throw new RuntimeException("Aviso: No se encontraron registros antiguos para purgar o el producto solo tiene su movimiento inicial.");
+        }
+    }
+    public void procesarSalidaKardex(Entidades.Pedido pedido) {
+        if (pedido == null || pedido.getDetalles().isEmpty()) return;
+
+        try (java.sql.Connection con = DAO.ConexionSQL.probarConexion()) {
+            con.setAutoCommit(false); // Transacción segura
+            try {
+                for (Entidades.DetallePedido dp : pedido.getDetalles()) {
+                    // 1. Buscamos el producto fresco de la base de datos
+                    Producto p = productoDAO.buscarPorId(dp.getProducto().getId());
+                    if (p == null) throw new IllegalArgumentException("Producto no encontrado");
+                    
+                    // 2. Restamos el stock usando la regla de tu entidad
+                    p.actualizarStock(dp.getCantidadVendida(), "salida");
+                    
+                    // 3. Generamos el registro para el Kardex
+                    Entidades.MovimientosKardex mk = new Entidades.MovimientosKardex(
+                        java.time.LocalDate.now().toString(), // Fecha del movimiento (Hoy)
+                        "salida",
+                        dp.getCantidadVendida(),
+                        p.getPrecioCompra(), // IMPORTANTE: Las salidas se valorizan al Costo Promedio (PrecioCompra)
+                        p.getStock(),
+                        p.getPrecioCompra(),
+                        p
+                    );
+                    
+                    // 4. Guardamos en el Kardex y actualizamos el Producto en cascada
+                    boolean kOK = kardexDAO.registrarTransaccional(con, mk);
+                    if (!kOK) throw new java.sql.SQLException("Error al insertar registro en Kardex.");
+                    
+                    boolean pOK = productoDAO.actualizarTransaccional(con, p);
+                    if (!pOK) throw new java.sql.SQLException("Error al actualizar stock del producto.");
+                }
+                
+                con.commit(); // Confirmamos los cambios
+            } catch (Exception e) {
+                con.rollback(); // Si algo falla, deshacemos
+                throw new RuntimeException("Fallo al procesar la salida en el Kardex: " + e.getMessage());
+            }
+        } catch (java.sql.SQLException e) {
+            System.err.println("Error de BD en procesarSalidaKardex: " + e.getMessage());
+        }
+    }
 }

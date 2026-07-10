@@ -28,8 +28,10 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
         this.gestorVentas = gestor;
         
         // Apagamos los botones de acción hasta que seleccionen una fila
-        btnProcesar.setEnabled(false);
+        
         btnCancelar.setEnabled(false);
+        btnEntregar.setEnabled(false);
+        
         
         actualizarTabla();
     }
@@ -78,9 +80,9 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
         tblPedidos = new javax.swing.JTable();
         btnRegresar = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
-        btnProcesar = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
         btnLimpiarCancelados = new javax.swing.JButton();
+        btnEntregar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -132,14 +134,14 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
         jLabel1.setText("Pedidos");
         jLabel1.setToolTipText("");
 
-        btnProcesar.setText("Procesar");
-        btnProcesar.addActionListener(this::btnProcesarActionPerformed);
-
-        btnCancelar.setText("Cancelar");
+        btnCancelar.setText("Cancelar Pedido");
         btnCancelar.addActionListener(this::btnCancelarActionPerformed);
 
         btnLimpiarCancelados.setText("Eliminar Cancelados");
         btnLimpiarCancelados.addActionListener(this::btnLimpiarCanceladosActionPerformed);
+
+        btnEntregar.setText("Confirmar entrega");
+        btnEntregar.addActionListener(this::btnEntregarActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -147,19 +149,18 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(59, 59, 59)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnProcesar)
-                        .addGap(72, 72, 72)
+                        .addComponent(btnEntregar, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
                         .addComponent(btnLimpiarCancelados, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(80, 80, 80)
+                        .addGap(33, 33, 33)
                         .addComponent(btnCancelar))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(btnRegresar)
-                            .addGap(110, 110, 110)
-                            .addComponent(jLabel1))
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 479, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnRegresar)
+                        .addGap(110, 110, 110)
+                        .addComponent(jLabel1))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 479, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(71, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -173,9 +174,9 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 253, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(30, 30, 30)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnProcesar)
                     .addComponent(btnCancelar)
-                    .addComponent(btnLimpiarCancelados))
+                    .addComponent(btnLimpiarCancelados)
+                    .addComponent(btnEntregar))
                 .addGap(55, 55, 55))
         );
 
@@ -199,8 +200,10 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
         // TODO add your handling code here:
         int fila = tblPedidos.getSelectedRow();
         if (fila != -1) {
-            btnProcesar.setEnabled(true);
+            
             btnCancelar.setEnabled(true);
+            btnEntregar.setEnabled(true);
+            
             
         }
     }//GEN-LAST:event_tblPedidosMouseReleased
@@ -224,39 +227,6 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_tblPedidosMouseClicked
-
-    private void btnProcesarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProcesarActionPerformed
-        // TODO add your handling code here:
-        int fila = tblPedidos.getSelectedRow();
-        if (fila != -1) {
-            try {
-                // 1. Obtenemos el código del pedido de la primera columna (índice 0)
-                int codigo = Integer.parseInt(tblPedidos.getValueAt(fila, 0).toString());
-                
-                // 2. Traemos el pedido completamente fresco desde la base de datos
-                Pedido pedidoCompleto = gestorVentas.obtenerDetallesDePedido(codigo);
-
-                if (pedidoCompleto != null) {
-                    if (pedidoCompleto.getDeudaPendiente() > 0) {
-                        // 3. Abrimos nuestra nueva ventana de caja
-                        jdialProcesarVenta caja = new jdialProcesarVenta(this, true);
-                        caja.prepararCobro(pedidoCompleto, gestorVentas);
-                        caja.setLocationRelativeTo(this);
-                        
-                        // El programa principal se pausa aquí hasta que la ventana de caja se cierre
-                        caja.setVisible(true); 
-                        
-                        // 4. Al cerrarse la caja, actualizamos la tabla para ver el saldo en cero
-                        actualizarTabla(); 
-                    } else {
-                        javax.swing.JOptionPane.showMessageDialog(this, "Este pedido ya está totalmente pagado.", "Aviso", javax.swing.JOptionPane.INFORMATION_MESSAGE);
-                    }
-                }
-            } catch (Exception ex) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Error al abrir cobro: " + ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }//GEN-LAST:event_btnProcesarActionPerformed
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
         // TODO add your handling code here:
@@ -289,6 +259,46 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
         }
     }
     }//GEN-LAST:event_btnLimpiarCanceladosActionPerformed
+
+    private void btnEntregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEntregarActionPerformed
+        int fila = tblPedidos.getSelectedRow();
+        if (fila != -1) {
+            try {
+                // 1. Obtenemos el código del pedido seleccionado
+                int codigo = Integer.parseInt(tblPedidos.getValueAt(fila, 0).toString());
+                
+                // 2. Traemos el pedido para verificar su estado actual
+                Pedido pedidoCompleto = gestorVentas.obtenerDetallesDePedido(codigo);
+                
+                if (pedidoCompleto != null) {
+                    if (pedidoCompleto.getEstado().equalsIgnoreCase("Entregado")) {
+                        javax.swing.JOptionPane.showMessageDialog(this, "El pedido ya se encuentra entregado.", "Aviso", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                        return;
+                    }
+                    if (pedidoCompleto.getEstado().equalsIgnoreCase("Cancelado")) {
+                        javax.swing.JOptionPane.showMessageDialog(this, "No se puede entregar un pedido cancelado.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    
+                    // 3. Confirmación de seguridad
+                    int confirmacion = javax.swing.JOptionPane.showConfirmDialog(this, 
+                        "¿Estás seguro de marcar este pedido como Entregado? Esto descontará el stock del inventario.", 
+                        "Confirmar Entrega", javax.swing.JOptionPane.YES_NO_OPTION);
+                        
+                    if (confirmacion == javax.swing.JOptionPane.YES_OPTION) {
+                        // 4. Llamamos al método que avanza el estado y descuenta el stock (el que editamos antes)
+                        gestorVentas.avanzarEstadoPedido(codigo);
+                        
+                        javax.swing.JOptionPane.showMessageDialog(this, "Pedido entregado con éxito. El inventario ha sido actualizado.");
+                        actualizarTabla();
+                    }
+                }
+            } catch (Exception ex) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Error al entregar el pedido: " + ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        
+    }//GEN-LAST:event_btnEntregarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -344,8 +354,8 @@ public class FmrGestionPedidos extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelar;
+    private javax.swing.JButton btnEntregar;
     private javax.swing.JButton btnLimpiarCancelados;
-    private javax.swing.JButton btnProcesar;
     private javax.swing.JButton btnRegresar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;

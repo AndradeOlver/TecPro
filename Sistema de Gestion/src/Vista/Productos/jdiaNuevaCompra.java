@@ -71,6 +71,7 @@ public class jdiaNuevaCompra extends javax.swing.JDialog {
         jLabel4 = new javax.swing.JLabel();
         cmbEstado = new javax.swing.JComboBox<>();
         jLabel5 = new javax.swing.JLabel();
+        btnQuitarDelCarrito = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -124,9 +125,12 @@ public class jdiaNuevaCompra extends javax.swing.JDialog {
 
         jLabel4.setText("Proveedor");
 
-        cmbEstado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Solicitada", "Pendiente", "Procesada", "Abonada" }));
+        cmbEstado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Solicitada", "Pendiente", "Procesada" }));
 
         jLabel5.setText("Estado");
+
+        btnQuitarDelCarrito.setText("Quitar");
+        btnQuitarDelCarrito.addActionListener(this::btnQuitarDelCarritoActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -171,6 +175,8 @@ public class jdiaNuevaCompra extends javax.swing.JDialog {
                 .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(cmbEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(57, 57, 57)
+                .addComponent(btnQuitarDelCarrito)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnProcesarCompra)
                 .addGap(67, 67, 67))
@@ -211,7 +217,8 @@ public class jdiaNuevaCompra extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnProcesarCompra)
                     .addComponent(cmbEstado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5))
+                    .addComponent(jLabel5)
+                    .addComponent(btnQuitarDelCarrito))
                 .addGap(15, 15, 15))
         );
 
@@ -330,6 +337,26 @@ public class jdiaNuevaCompra extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_btnBuscarProveedorActionPerformed
 
+    private void btnQuitarDelCarritoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnQuitarDelCarritoActionPerformed
+            // 1. Verificamos qué fila seleccionó el usuario en la tabla
+        int fila = jTable1.getSelectedRow();
+
+        if (fila != -1) {
+            // 2. Lo eliminamos de nuestra lista temporal
+            carritoTemporal.remove(fila);
+
+            // 3. Repintamos la tabla
+            actualizarTablaCarrito();
+
+            // 4. Si el carrito se queda vacío, le permitimos cambiar de proveedor otra vez
+            if (carritoTemporal.isEmpty()) {
+                btnBuscarProveedor.setEnabled(true);
+            }
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this, "Seleccione un producto de la tabla para quitarlo.", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_btnQuitarDelCarritoActionPerformed
+
     private void actualizarTablaCarrito() {
     // 1. Capturamos el modelo y limpiamos el lienzo
     javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) jTable1.getModel();
@@ -364,6 +391,7 @@ public class jdiaNuevaCompra extends javax.swing.JDialog {
     private javax.swing.JButton btnBuscarProducto;
     private javax.swing.JButton btnBuscarProveedor;
     private javax.swing.JButton btnProcesarCompra;
+    private javax.swing.JButton btnQuitarDelCarrito;
     private javax.swing.JComboBox<String> cmbEstado;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

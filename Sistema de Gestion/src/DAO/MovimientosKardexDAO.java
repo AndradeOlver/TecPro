@@ -83,4 +83,32 @@ public class MovimientosKardexDAO {
         return true;
     }
 }
+    // Método para eliminar el historial a excepción de la última entrada
+    public boolean purgarHistorial(int idProducto) {
+        String sql = "DELETE FROM MovimientosKardex "
+                   + "WHERE Producto_ID = ? "
+                   + "AND IdMovimiento NOT IN ("
+                   + "    SELECT TOP 1 IdMovimiento "
+                   + "    FROM MovimientosKardex "
+                   + "    WHERE Producto_ID = ? AND TipoMovimiento = 'entrada' "
+                   + "    ORDER BY FechaMovimiento DESC, IdMovimiento DESC"
+                   + ")";
+                   
+        try (Connection con = ConexionSQL.probarConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            // Pasamos el ID del producto dos veces (una para el DELETE y otra para el SELECT)
+            ps.setInt(1, idProducto);
+            ps.setInt(2, idProducto);
+            
+            int filasAfectadas = ps.executeUpdate();
+            
+            // Retorna true si logró eliminar 1 o más registros antiguos
+            return filasAfectadas > 0;
+            
+        } catch (SQLException e) {
+            System.err.println("Error al purgar el historial del Kardex: " + e.getMessage());
+            return false;
+        }
+    }
 }
