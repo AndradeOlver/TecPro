@@ -1,0 +1,6 @@
+
+db.servidor=localhost
+db.puerto=1433
+db.nombre=nombre_de_tu_base
+db.usuario=tu_usuario
+db.clave=tu_password

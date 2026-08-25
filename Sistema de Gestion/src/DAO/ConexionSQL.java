@@ -3,56 +3,62 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package DAO;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
 /**
  *
  * @author equipo
  */
 public class ConexionSQL {
-    // 1. Los Parámetros de Ruta (Cadena de Conexión)
-    // Reemplaza "NombreDeTuBD", "tu_usuario" y "tu_contraseña" con tus datos reales.
-        private static final String SERVIDOR = "sql5101.site4now.net";
-    private static final String PUERTO = "1433";
-    private static final String BASE_DATOS = "db_acb22b_proyectoelvia";
-    private static final String USUARIO = "db_acb22b_proyectoelvia_admin";
-    private static final String CLAVE = "Elllara140";
     
-    // URL formateada para el driver de Microsoft
-    private static final String URL = "jdbc:sqlserver://" + SERVIDOR + ":" + PUERTO + 
-                                      ";databaseName=" + BASE_DATOS + 
-                                      ";encrypt=true;trustServerCertificate=true;";
 
     public static Connection probarConexion() {
         Connection conexion = null;
-        
-        
-        try {
-            
+        Properties propiedades = new Properties();
+
+        // Leemos el archivo de configuración externo
+        try (InputStream entrada = new FileInputStream("config.properties")) {
+            propiedades.load(entrada);
+
+            String servidor = propiedades.getProperty("db.servidor");
+            String puerto = propiedades.getProperty("db.puerto");
+            String baseDatos = propiedades.getProperty("db.nombre");
+            String usuario = propiedades.getProperty("db.usuario");
+            String clave = propiedades.getProperty("db.clave");
+
+            // URL formateada para el driver de Microsoft
+            String url = "jdbc:sqlserver://" + servidor + ":" + puerto + 
+                         ";databaseName=" + baseDatos + 
+                         ";encrypt=true;trustServerCertificate=true;";
+
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            
-            
-            conexion = DriverManager.getConnection(URL, USUARIO, CLAVE);
-            
-           
+            conexion = DriverManager.getConnection(url, usuario, clave);
+
             if (conexion != null) {
                 System.out.println("¡Conexión establecida con éxito a SQL Server!");
             }
-            
+
+        } catch (java.io.FileNotFoundException e) {
+            System.err.println("Error crítico: No se encontró el archivo config.properties en la raíz del proyecto.");
         } catch (ClassNotFoundException e) {
             System.err.println("Error crítico: No se encontró el Driver de SQL Server.");
             System.err.println("Detalle: " + e.getMessage());
         } catch (SQLException e) {
             System.err.println("Error de conexión: Verifica que el servidor esté encendido y las credenciales sean correctas.");
             System.err.println("Detalle: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Error inesperado al leer la configuración.");
+            System.err.println("Detalle: " + e.getMessage());
         }
         
         return conexion;
     }
 
-    // 6. La Limpieza (Método auxiliar para cerrar la conexión cuando termines de usarla)
     public static void cerrarConexion(Connection conexion) {
         if (conexion != null) {
             try {

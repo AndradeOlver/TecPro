@@ -32,9 +32,12 @@ replay_pid*
 **/nbproject/Makefile-*.mk
 **/nbproject/Package-*.bash
 build/
+/build/
 nbbuild/
 dist/
 nbdist/
+/dist/
 .nb-gradle/
-
+*.txt
+*.docx
 # End of https://www.toptal.com/developers/gitignore/api/java,netbeans
