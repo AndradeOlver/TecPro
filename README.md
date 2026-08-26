@@ -1,4 +1,4 @@
-# 📦 Sistema de Gestión Comercial y Kardex (TecPro)
+# 📦 Sistema de Gestión Comercial
 
 Este es un proyecto de aplicación de escritorio desarrollado en Java. Lo construí con el objetivo principal de **aprender de manera constante**, buscando siempre aplicar e interiorizar las **buenas prácticas de desarrollo de software** conforme avanzo en mi carrera de Ingeniería de Sistemas Computacionales.
 
